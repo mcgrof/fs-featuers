@@ -310,6 +310,10 @@ def render(features: list[dict], analysis: dict) -> str:
            class="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg font-medium">
           JSON
         </a>
+        <a href="../reports/findings.md"
+           class="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg font-medium">
+          findings
+        </a>
       </div>
     </header>
 
