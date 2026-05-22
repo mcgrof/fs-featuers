@@ -34,14 +34,17 @@ plots: $(DOCS)/images/timeline.png
 $(DOCS)/images/timeline.png: $(FEATURE_JSONS) $(SCRIPTS)/plot.py
 	$(PYTHON) $(SCRIPTS)/plot.py
 
-report: $(DOCS)/index.html
+report: $(DOCS)/index.html $(DOCS)/findings.html
 $(DOCS)/index.html: $(FEATURE_JSONS) $(DATA)/analysis.json $(SCRIPTS)/build_html.py
 	$(PYTHON) $(SCRIPTS)/build_html.py
+$(DOCS)/findings.html: $(REPORTS)/findings.md $(SCRIPTS)/render_findings.py
+	$(PYTHON) $(SCRIPTS)/render_findings.py
 
 clean:
 	rm -f $(DATA)/features_all.csv $(DATA)/analysis.json
 	rm -f $(REPORTS)/analysis.md
-	rm -f $(DOCS)/index.html
+	rm -f $(DOCS)/index.html $(DOCS)/findings.html
+	rm -f $(DOCS)/*.csv $(DOCS)/*.json $(DOCS)/*.md
 	rm -rf $(DOCS)/images
 
 whitespace-fix:

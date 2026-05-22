@@ -330,7 +330,7 @@ def render(features: list[dict], analysis: dict) -> str:
            class="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg font-medium">
           JSON
         </a>
-        <a href="findings.md"
+        <a href="findings.html"
            class="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg font-medium">
           findings
         </a>
@@ -508,7 +508,7 @@ def render(features: list[dict], analysis: dict) -> str:
       <p class="mb-2">
         <a href="https://github.com/mcgrof/fs-features" class="hover:text-gray-400">source</a>
         <span class="mx-2">&middot;</span>
-        <a href="findings.md" class="hover:text-gray-400">findings.md</a>
+        <a href="findings.html" class="hover:text-gray-400">findings</a>
         <span class="mx-2">&middot;</span>
         <a href="analysis.md" class="hover:text-gray-400">analysis.md</a>
       </p>

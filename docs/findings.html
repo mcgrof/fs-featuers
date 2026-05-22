@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>fs-features: Findings</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { background: #0f172a; }
+    .card {
+      background: linear-gradient(145deg, #1e293b, #1a2332);
+      border: 1px solid #334155;
+    }
+    .prose-card h2:first-child { margin-top: 0; }
+    a code { color: inherit; }
+  </style>
+</head>
+<body class="min-h-screen text-gray-100">
+  <div class="max-w-4xl mx-auto px-6 py-12">
+
+    <nav class="mb-8 flex items-center justify-between text-sm">
+      <a href="index.html" class="text-gray-400 hover:text-gray-200">
+        &larr; back to fs-features
+      </a>
+      <div class="flex gap-3">
+        <a href="features_all.csv"
+           class="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 rounded font-medium">
+          CSV
+        </a>
+        <a href="analysis.json"
+           class="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 rounded font-medium">
+          JSON
+        </a>
+        <a href="findings.md"
+           class="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 rounded font-medium">
+          .md
+        </a>
+      </div>
+    </nav>
+
+    <article class="card rounded-xl p-8 md:p-12 prose-card">
+<h1 id="findings-filesystem-feature-stabilization-with-lbs-in-context" class="text-4xl font-bold mb-6 text-gray-100">Findings: filesystem feature stabilization, with LBS in context</h1>
+<p class="text-gray-300 leading-relaxed mb-4">This report answers the questions in PROMPTS.md against the data in
+<code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">data/features_*.json</code> and <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">data/analysis.json</code>. Numbers are computed by
+<code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">scripts/analyze.py</code> from a kernel tree at HEAD ~ v7.1-rc4. All durations
+are in years, rounded to two decimal places.</p>
+<h2 id="how-long-does-a-feature-take-from-rfc-to-merge" class="text-2xl font-bold mt-12 mb-4 pb-2 border-b border-gray-700 text-gray-100">How long does a feature take from RFC to merge?</h2>
+<p class="text-gray-300 leading-relaxed mb-4">Across 55 catalogued features for which both RFC and merge dates are
+recorded, the global RFC-to-merge wall-clock is:</p>
+<table class="w-full text-sm border-collapse mb-6">
+<thead class="border-b border-gray-700 text-gray-400">
+<tr class="border-b border-gray-800">
+<th class="text-left py-2 px-3 font-medium">set</th>
+<th class="text-left py-2 px-3 font-medium">n</th>
+<th class="text-left py-2 px-3 font-medium">mean</th>
+<th class="text-left py-2 px-3 font-medium">median</th>
+<th class="text-left py-2 px-3 font-medium">p90</th>
+<th class="text-left py-2 px-3 font-medium">min</th>
+<th class="text-left py-2 px-3 font-medium">max</th>
+</tr>
+</thead>
+<tbody>
+<tr class="border-b border-gray-800">
+<td class="py-2 px-3 text-gray-300 align-top">all</td>
+<td class="py-2 px-3 text-gray-300 align-top">55</td>
+<td class="py-2 px-3 text-gray-300 align-top">0.71y</td>
+<td class="py-2 px-3 text-gray-300 align-top">0.48y</td>
+<td class="py-2 px-3 text-gray-300 align-top">1.27y</td>
+<td class="py-2 px-3 text-gray-300 align-top">0.04y</td>
+<td class="py-2 px-3 text-gray-300 align-top">4.98y</td>
+</tr>
+<tr class="border-b border-gray-800">
+<td class="py-2 px-3 text-gray-300 align-top">LBS excluded</td>
+<td class="py-2 px-3 text-gray-300 align-top">52</td>
+<td class="py-2 px-3 text-gray-300 align-top">0.71y</td>
+<td class="py-2 px-3 text-gray-300 align-top">0.47y</td>
+<td class="py-2 px-3 text-gray-300 align-top">1.29y</td>
+<td class="py-2 px-3 text-gray-300 align-top">0.04y</td>
+<td class="py-2 px-3 text-gray-300 align-top">4.98y</td>
+</tr>
+</tbody>
+</table>
+<p class="text-gray-300 leading-relaxed mb-4">The "ten-year filesystem" rule of thumb is whole-filesystem; the
+per-feature distribution is much tighter and the median lands well under a
+year. The features that took multi-year RFC-to-merge are real outliers:</p>
+<ul class="list-disc ml-6 space-y-1 mb-4 text-gray-300">
+<li class="leading-relaxed"><code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">xfs_parent</code> (parent pointers): 4.98y. Allison Henderson's first RFC was
+  May 2019, but the dependency chain (delayed attributes, the
+  log-incompat-feature bit machinery) had to land first.</li>
+<li class="leading-relaxed"><code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">xfs_log_xattrs</code>: 2.77y. Same dependency story from the other end -- it
+  is the dependency that parent pointers needed.</li>
+<li class="leading-relaxed"><code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">ext4_iomap_dio</code>: 3.12y. ext4's main DIO conversion took years because
+  the iomap-for-buffered-IO path took years.</li>
+</ul>
+<p class="text-gray-300 leading-relaxed mb-4">Removing LBS does almost nothing to the headline number because the RFC
+of the <em class="italic text-gray-200">successful</em> 2023 LBS attempt (Pankaj Raghav, Sep 15 2023) landed
+at 0.97y -- within the per-feature range. The "LBS got merged faster"
+story is therefore not a story about RFC-to-merge in isolation; it is a
+story about which prior attempt the clock starts from.</p>
+<h2 id="what-does-the-lbs-biography-actually-say" class="text-2xl font-bold mt-12 mb-4 pb-2 border-b border-gray-700 text-gray-100">What does the LBS biography actually say?</h2>
+<p class="text-gray-300 leading-relaxed mb-4">The kernel newbies LBS page (linked from the catalog) records five prior
+attempts that did not land:</p>
+<table class="w-full text-sm border-collapse mb-6">
+<thead class="border-b border-gray-700 text-gray-400">
+<tr class="border-b border-gray-800">
+<th class="text-left py-2 px-3 font-medium">year</th>
+<th class="text-left py-2 px-3 font-medium">author</th>
+<th class="text-left py-2 px-3 font-medium">what</th>
+<th class="text-left py-2 px-3 font-medium">outcome</th>
+</tr>
+</thead>
+<tbody>
+<tr class="border-b border-gray-800">
+<td class="py-2 px-3 text-gray-300 align-top">2007-05</td>
+<td class="py-2 px-3 text-gray-300 align-top">Christoph Lameter</td>
+<td class="py-2 px-3 text-gray-300 align-top">Compound-page support for &gt;PAGE_SIZE block sizes in the page cache</td>
+<td class="py-2 px-3 text-gray-300 align-top">Stalled</td>
+</tr>
+<tr class="border-b border-gray-800">
+<td class="py-2 px-3 text-gray-300 align-top">2007-07</td>
+<td class="py-2 px-3 text-gray-300 align-top">Nick Piggin</td>
+<td class="py-2 px-3 text-gray-300 align-top">fsblock RFC, replace buffer heads</td>
+<td class="py-2 px-3 text-gray-300 align-top">Stalled</td>
+</tr>
+<tr class="border-b border-gray-800">
+<td class="py-2 px-3 text-gray-300 align-top">2009-03</td>
+<td class="py-2 px-3 text-gray-300 align-top">Nick Piggin</td>
+<td class="py-2 px-3 text-gray-300 align-top">fsblock updated patches</td>
+<td class="py-2 px-3 text-gray-300 align-top">Did not land</td>
+</tr>
+<tr class="border-b border-gray-800">
+<td class="py-2 px-3 text-gray-300 align-top">2017-03</td>
+<td class="py-2 px-3 text-gray-300 align-top">LSFMM 2017</td>
+<td class="py-2 px-3 text-gray-300 align-top">Discussion on whether LBS was worth revisiting</td>
+<td class="py-2 px-3 text-gray-300 align-top">Inconclusive</td>
+</tr>
+<tr class="border-b border-gray-800">
+<td class="py-2 px-3 text-gray-300 align-top">2018-11</td>
+<td class="py-2 px-3 text-gray-300 align-top">Dave Chinner</td>
+<td class="py-2 px-3 text-gray-300 align-top">Renewed attempt at &gt;PAGE_SIZE block sizes in XFS</td>
+<td class="py-2 px-3 text-gray-300 align-top">Stalled</td>
+</tr>
+<tr class="border-b border-gray-800">
+<td class="py-2 px-3 text-gray-300 align-top">2023-09</td>
+<td class="py-2 px-3 text-gray-300 align-top">Pankaj Raghav et al</td>
+<td class="py-2 px-3 text-gray-300 align-top">XFS LBS RFC</td>
+<td class="py-2 px-3 text-gray-300 align-top">Merged v6.12 in 0.97y</td>
+</tr>
+</tbody>
+</table>
+<p class="text-gray-300 leading-relaxed mb-4">From 2007-05-15 to 2024-09-03 is <strong class="font-semibold text-gray-100">17.31 years of wall-clock between the
+first proposal and the merge that actually landed</strong>. That is the longest
+first-idea-to-merge of any feature in the catalog, by a margin -- the next
+longest first-idea-to-merge is delayed logging at under a year (delaylog
+came together quickly once the design was clear).</p>
+<p class="text-gray-300 leading-relaxed mb-4">Within that 17-year span, what was different about the 2023 attempt? Two
+load-bearing changes happened on the mm side independently before LBS
+landed in fs/xfs:</p>
+<ul class="list-disc ml-6 space-y-1 mb-4 text-gray-300">
+<li class="leading-relaxed">The folio/large-folio rework in mm (struct folio, multi-page folios in
+  the page cache) finally provided a unit larger than <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">struct page</code> that
+  the page cache could carry.</li>
+<li class="leading-relaxed">The iomap conversion in XFS (buffered I/O in v5.5, 2019) had moved the
+  filesystem off buffer_heads where it counted, so the LBS series did not
+  have to rewrite the I/O path as part of its own scope.</li>
+</ul>
+<p class="text-gray-300 leading-relaxed mb-4">On the testing side, the 2023 series was test-driven by kdevops with
+AI-assisted triage, materially expanding the matrix of block sizes, page
+sizes, and workloads that exercised the path before merge. The prior
+attempts had nothing comparable. The catalog records this as a note on
+the feature; the <em class="italic text-gray-200">empirical</em> impact is hard to isolate from the mm
+prerequisites that landed in the same window.</p>
+<h2 id="after-xfs-what-happened-to-ext4-and-btrfs" class="text-2xl font-bold mt-12 mb-4 pb-2 border-b border-gray-700 text-gray-100">After XFS, what happened to ext4 and btrfs?</h2>
+<p class="text-gray-300 leading-relaxed mb-4">XFS LBS merged 2024-09-03. The follow-on filesystems:</p>
+<table class="w-full text-sm border-collapse mb-6">
+<thead class="border-b border-gray-700 text-gray-400">
+<tr class="border-b border-gray-800">
+<th class="text-left py-2 px-3 font-medium">fs</th>
+<th class="text-left py-2 px-3 font-medium">RFC</th>
+<th class="text-left py-2 px-3 font-medium">merged</th>
+<th class="text-left py-2 px-3 font-medium">RFC-&gt;merge</th>
+<th class="text-left py-2 px-3 font-medium">lag after XFS LBS</th>
+</tr>
+</thead>
+<tbody>
+<tr class="border-b border-gray-800">
+<td class="py-2 px-3 text-gray-300 align-top">XFS</td>
+<td class="py-2 px-3 text-gray-300 align-top">2023-09-15</td>
+<td class="py-2 px-3 text-gray-300 align-top">2024-09-03 (v6.12)</td>
+<td class="py-2 px-3 text-gray-300 align-top">0.97y</td>
+<td class="py-2 px-3 text-gray-300 align-top">0 (origin)</td>
+</tr>
+<tr class="border-b border-gray-800">
+<td class="py-2 px-3 text-gray-300 align-top">btrfs</td>
+<td class="py-2 px-3 text-gray-300 align-top">2024-11-27</td>
+<td class="py-2 px-3 text-gray-300 align-top">2025-09-23 (v6.18)</td>
+<td class="py-2 px-3 text-gray-300 align-top">0.82y</td>
+<td class="py-2 px-3 text-gray-300 align-top">1.05y</td>
+</tr>
+<tr class="border-b border-gray-800">
+<td class="py-2 px-3 text-gray-300 align-top">ext4</td>
+<td class="py-2 px-3 text-gray-300 align-top">2025-07-25</td>
+<td class="py-2 px-3 text-gray-300 align-top">2025-11-28 (v6.19)</td>
+<td class="py-2 px-3 text-gray-300 align-top">0.34y</td>
+<td class="py-2 px-3 text-gray-300 align-top">1.23y</td>
+</tr>
+</tbody>
+</table>
+<p class="text-gray-300 leading-relaxed mb-4">ext4's 0.34y RFC-to-merge is among the fastest in the entire catalog --
+faster than any other ext4 feature except <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">ext4_encrypt</code> (which was
+0.04y because the encryption-feature codepoints were merged before the
+actual encryption code). The likely interpretation: ext4 inherited the
+mm/iomap large-folio runway and only needed to wire up the fs-level
+plumbing. The per-fs LBS cost dropped sharply once XFS had paid the mm
+cost.</p>
+<p class="text-gray-300 leading-relaxed mb-4">btrfs took longer (0.82y) because it had to extend its pre-existing
+subpage machinery to symmetric bs &gt; ps territory, not just inherit folio
+support. The btrfs LBS series is in v6.18 and is still marked
+experimental.</p>
+<h2 id="does-mm-impact-track-with-longer-stabilization" class="text-2xl font-bold mt-12 mb-4 pb-2 border-b border-gray-700 text-gray-100">Does mm-impact track with longer stabilization?</h2>
+<table class="w-full text-sm border-collapse mb-6">
+<thead class="border-b border-gray-700 text-gray-400">
+<tr class="border-b border-gray-800">
+<th class="text-left py-2 px-3 font-medium">bucket</th>
+<th class="text-left py-2 px-3 font-medium">n</th>
+<th class="text-left py-2 px-3 font-medium">mean</th>
+<th class="text-left py-2 px-3 font-medium">median</th>
+<th class="text-left py-2 px-3 font-medium">p90</th>
+<th class="text-left py-2 px-3 font-medium">max</th>
+</tr>
+</thead>
+<tbody>
+<tr class="border-b border-gray-800">
+<td class="py-2 px-3 text-gray-300 align-top">none</td>
+<td class="py-2 px-3 text-gray-300 align-top">38</td>
+<td class="py-2 px-3 text-gray-300 align-top">0.65y</td>
+<td class="py-2 px-3 text-gray-300 align-top">0.35y</td>
+<td class="py-2 px-3 text-gray-300 align-top">1.24y</td>
+<td class="py-2 px-3 text-gray-300 align-top">4.98y</td>
+</tr>
+<tr class="border-b border-gray-800">
+<td class="py-2 px-3 text-gray-300 align-top">minor</td>
+<td class="py-2 px-3 text-gray-300 align-top">12</td>
+<td class="py-2 px-3 text-gray-300 align-top">0.92y</td>
+<td class="py-2 px-3 text-gray-300 align-top">0.86y</td>
+<td class="py-2 px-3 text-gray-300 align-top">1.29y</td>
+<td class="py-2 px-3 text-gray-300 align-top">3.12y</td>
+</tr>
+<tr class="border-b border-gray-800">
+<td class="py-2 px-3 text-gray-300 align-top">major</td>
+<td class="py-2 px-3 text-gray-300 align-top">5</td>
+<td class="py-2 px-3 text-gray-300 align-top">0.68y</td>
+<td class="py-2 px-3 text-gray-300 align-top">0.79y</td>
+<td class="py-2 px-3 text-gray-300 align-top">0.91y</td>
+<td class="py-2 px-3 text-gray-300 align-top">0.97y</td>
+</tr>
+</tbody>
+</table>
+<p class="text-gray-300 leading-relaxed mb-4">mm-impact major bucket is a small sample (DAX-on-XFS, DAX-on-ext4, and
+LBS in each of XFS/ext4/btrfs). Its tight distribution has a clear
+explanation: the mm cost was paid out of band (DAX over years of
+devmap/pgmap work; LBS over years of folio work), so by the time the
+fs-level patch posted RFC, the heavy lift was already done. The mm
+"major" features look fast at RFC-to-merge because they were <em class="italic text-gray-200">not</em> fast
+end to end -- the years are hidden in unrelated mm patch series.</p>
+<p class="text-gray-300 leading-relaxed mb-4">The "minor" bucket is the one that actually correlates with delay: iomap
+hooks, verity, encryption, subpage, zoned -- features that touched the
+page cache or iomap path but did not drive new mm primitives.</p>
+<h2 id="how-long-does-a-feature-take-to-ship-in-enterprise-linux" class="text-2xl font-bold mt-12 mb-4 pb-2 border-b border-gray-700 text-gray-100">How long does a feature take to ship in enterprise Linux?</h2>
+<p class="text-gray-300 leading-relaxed mb-4">Of the 55 features, 44 have a recorded SUSE or RHEL enablement date:</p>
+<table class="w-full text-sm border-collapse mb-6">
+<thead class="border-b border-gray-700 text-gray-400">
+<tr class="border-b border-gray-800">
+<th class="text-left py-2 px-3 font-medium">metric</th>
+<th class="text-left py-2 px-3 font-medium">n</th>
+<th class="text-left py-2 px-3 font-medium">mean</th>
+<th class="text-left py-2 px-3 font-medium">median</th>
+<th class="text-left py-2 px-3 font-medium">p90</th>
+<th class="text-left py-2 px-3 font-medium">max</th>
+</tr>
+</thead>
+<tbody>
+<tr class="border-b border-gray-800">
+<td class="py-2 px-3 text-gray-300 align-top">merge -&gt; first enterprise</td>
+<td class="py-2 px-3 text-gray-300 align-top">44</td>
+<td class="py-2 px-3 text-gray-300 align-top">2.24y</td>
+<td class="py-2 px-3 text-gray-300 align-top">2.13y</td>
+<td class="py-2 px-3 text-gray-300 align-top">2.95y</td>
+<td class="py-2 px-3 text-gray-300 align-top">8.05y</td>
+</tr>
+<tr class="border-b border-gray-800">
+<td class="py-2 px-3 text-gray-300 align-top">RFC -&gt; first enterprise</td>
+<td class="py-2 px-3 text-gray-300 align-top">44</td>
+<td class="py-2 px-3 text-gray-300 align-top">2.82y</td>
+<td class="py-2 px-3 text-gray-300 align-top">2.59y</td>
+<td class="py-2 px-3 text-gray-300 align-top">4.29y</td>
+<td class="py-2 px-3 text-gray-300 align-top">8.09y</td>
+</tr>
+</tbody>
+</table>
+<p class="text-gray-300 leading-relaxed mb-4">This is the "ten-year filesystem" rule applied at the per-feature scale:
+<strong class="font-semibold text-gray-100">from RFC to a SUSE or Red Hat customer running it as enabled is on
+average two-and-a-half years</strong>, with a long right tail (xfs_repair_online
+took 8 years).</p>
+<p class="text-gray-300 leading-relaxed mb-4">The fastest merge-to-enterprise in the catalog is <strong class="font-semibold text-gray-100">XFS LBS at 0.71y</strong>,
+RHEL 10 picked it up as a Technology Preview the next merge window.
+That is roughly 3x faster than the average. Other fast cases:
+xfs_iomap_buffered (0.75y), btrfs_compress_zstd (0.92y), xfs_swapfile
+(1.11y). The shared pattern: features whose downstream consumers
+(databases, container runtimes, hyperscalers) had been asking for them
+loudly before merge.</p>
+<h2 id="fixes-tag-fan-out" class="text-2xl font-bold mt-12 mb-4 pb-2 border-b border-gray-700 text-gray-100">Fixes-tag fan-out</h2>
+<p class="text-gray-300 leading-relaxed mb-4"><code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">fixes_count</code> is the number of subsequent commits referencing the seed
+sha in a <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">Fixes: &lt;sha&gt;</code> trailer, scanned on HEAD and bounded by the seed
+sha's merge date. It is a low-quality proxy for post-merge fragility
+because:</p>
+<ul class="list-disc ml-6 space-y-1 mb-4 text-gray-300">
+<li class="leading-relaxed">Big topic-branch features land across many commits; we only count
+  fixes citing the chosen seed sha, not the full series.</li>
+<li class="leading-relaxed">Some Fixes: tags reference fixup commits within the original series.</li>
+<li class="leading-relaxed">A feature with zero Fixes hits might be deeply stable, or it might be
+  one whose later breakage cited a different sha than ours.</li>
+</ul>
+<p class="text-gray-300 leading-relaxed mb-4">With those caveats, the distribution is dominated by zeros. The two
+non-zero seed shas worth mentioning:</p>
+<ul class="list-disc ml-6 space-y-1 mb-4 text-gray-300">
+<li class="leading-relaxed"><code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">ext4_mballoc</code> at 4 hits across an 17.83-year window -- fits, given
+  how long mballoc has been the ext4 default.</li>
+<li class="leading-relaxed"><code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">ext4_iomap_dio</code> at 4 hits within its 6-year window -- consistent
+  with the well-known DIO-iomap rough edges.</li>
+</ul>
+<p class="text-gray-300 leading-relaxed mb-4">LBS has 2 hits on XFS and 1 on btrfs since merge, in a sub-1-year window.
+At this point the signal is too small to interpret; we re-check next
+year.</p>
+<h2 id="what-does-this-say-about-the-aikdevops-question" class="text-2xl font-bold mt-12 mb-4 pb-2 border-b border-gray-700 text-gray-100">What does this say about the AI/kdevops question?</h2>
+<p class="text-gray-300 leading-relaxed mb-4">The user's framing was whether the LBS schedule was visibly faster than
+the historical baseline because of kdevops plus AI-assisted testing. The
+data say:</p>
+<ul class="list-disc ml-6 space-y-1 mb-4 text-gray-300">
+<li class="leading-relaxed"><strong class="font-semibold text-gray-100">Per-attempt RFC-to-merge for LBS-on-XFS (0.97y)</strong> is <em class="italic text-gray-200">not</em> faster
+  than the global average (0.71y). On that metric alone the 2023 attempt
+  is unremarkable.</li>
+<li class="leading-relaxed"><strong class="font-semibold text-gray-100">First-idea-to-merge for LBS (17.31y)</strong> is the longest in the catalog
+  by a wide margin. The 2023 attempt was the first to actually land.</li>
+<li class="leading-relaxed"><strong class="font-semibold text-gray-100">Merge-to-enterprise for XFS LBS (0.71y)</strong> is the fastest in the
+  catalog. RHEL 10 shipped LBS within the first merge window after its
+  upstream landing.</li>
+<li class="leading-relaxed"><strong class="font-semibold text-gray-100">ext4 and btrfs LBS adoption took 0.34y and 0.82y RFC-to-merge</strong>,
+  consistent with reusing the mm runway XFS forced into existence.</li>
+</ul>
+<p class="text-gray-300 leading-relaxed mb-4">The conclusion the data support: <strong class="font-semibold text-gray-100">the LBS schedule looks slow at any
+single RFC and exceptionally short across the whole arc</strong>. The 2023
+attempt was the one that finally cleared the gates, and the gates that
+mattered (mm folios, iomap maturity, kdevops-driven test surface
+expansion) had been moved by years of separate work. Crediting AI in
+isolation would be hard to defend on these numbers; crediting the
+combination of mm prerequisites, iomap maturity, and the
+kdevops-plus-AI test surface that the 2023 series was tested under is
+defensible and consistent with the catalog.</p>
+<h2 id="caveats" class="text-2xl font-bold mt-12 mb-4 pb-2 border-b border-gray-700 text-gray-100">Caveats</h2>
+<ul class="list-disc ml-6 space-y-1 mb-4 text-gray-300">
+<li class="leading-relaxed">"RFC date" is the first list posting of the patch series that
+  ultimately landed. For LBS, prior failed RFCs are tracked separately
+  in <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">historical_attempts</code> so neither the per-feature RFC-to-merge nor
+  the first-idea-to-merge numbers are confused with each other.</li>
+<li class="leading-relaxed">Enterprise enablement dates are vendor-release-month, not internal
+  test-cycle start. SUSE and Red Hat both run multi-year stabilization
+  internally; the catalog records the customer-visible date, which is
+  the one the rest of the industry can verify.</li>
+<li class="leading-relaxed">The catalog is incomplete by design. Bug-fix and cleanup features are
+  out of scope; only landings that introduced a new format-level or
+  interface-level capability are tracked. The full Fixes-tag fan-out
+  numbers would change if every commit on a topic branch were
+  considered a seed.</li>
+<li class="leading-relaxed">The kernel tree HEAD this report was generated against is
+  v7.1-rc4. Later kernels will move the post-merge Fixes counts upward
+  on the still-young LBS features; that is a feature of the pipeline,
+  not a flaw of the methodology.</li>
+</ul>
+    </article>
+
+    <footer class="text-center text-gray-600 text-sm mt-12 pt-8 border-t border-gray-800">
+      <p class="mb-2">
+        <a href="index.html" class="hover:text-gray-400">report</a>
+        <span class="mx-2">&middot;</span>
+        <a href="https://github.com/mcgrof/fs-features" class="hover:text-gray-400">source</a>
+      </p>
+      <p>MIT License &middot; Luis Chamberlain and contributors</p>
+    </footer>
+  </div>
+</body>
+</html>
