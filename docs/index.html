@@ -1,0 +1,1931 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>fs-features: Linux filesystem feature stabilization</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { background: #0f172a; }
+    .card {
+      background: linear-gradient(145deg, #1e293b, #1a2332);
+      border: 1px solid #334155;
+      transition: all 0.3s ease;
+    }
+    .card:hover {
+      border-color: #3b82f6;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 40px -10px rgba(59, 130, 246, 0.3);
+    }
+    .camp-header {
+      border-bottom: 1px solid #334155;
+      padding-bottom: 8px;
+      margin-bottom: 16px;
+    }
+    .figure img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 0.5rem;
+      border: 1px solid #334155;
+    }
+  </style>
+</head>
+<body class="min-h-screen text-gray-100">
+  <div class="max-w-6xl mx-auto px-6 py-12">
+
+    <header class="text-center mb-16">
+      <h1 class="text-4xl font-bold mb-3">fs-features</h1>
+      <p class="text-xl text-gray-400 mb-2">
+        How long does it take to stabilize a Linux filesystem feature?
+      </p>
+      <p class="text-gray-500 max-w-3xl mx-auto">
+        A catalog of 55 major XFS, ext4, and btrfs features and the wall-clock
+        each took to go from RFC posting through merge through enterprise distribution
+        enablement. Re-runnable: the pipeline derives merge dates and Fixes-tag fan-out from
+        any kernel tree on disk.
+      </p>
+      <div class="mt-6 flex justify-center gap-3 text-sm">
+        <a href="https://github.com/mcgrof/fs-features"
+           class="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg font-medium">
+          source
+        </a>
+        <a href="../data/features_all.csv"
+           class="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg font-medium">
+          CSV
+        </a>
+        <a href="../data/analysis.json"
+           class="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg font-medium">
+          JSON
+        </a>
+      </div>
+    </header>
+
+    <section class="mb-14" id="summary">
+      <div class="camp-header">
+        <h2 class="text-2xl font-bold">Summary</h2>
+        <p class="text-gray-500 text-sm mt-1">
+          Aggregate stabilization metrics across all 55 tracked features.
+        </p>
+      </div>
+
+      <div class="card rounded-xl p-6 overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-gray-700 text-gray-400">
+              <th class="text-left py-2 px-3">metric</th>
+              <th class="text-center py-2 px-3">n</th>
+              <th class="text-right py-2 px-3">mean</th>
+              <th class="text-right py-2 px-3">median</th>
+              <th class="text-right py-2 px-3">p90</th>
+              <th class="text-right py-2 px-3">max</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+    <tr class="border-b border-gray-800">
+      <td class="py-2 px-3 text-gray-300">RFC -&gt; merge (all)</td>
+      <td class="py-2 px-3 text-center text-gray-400">55</td>
+      <td class="py-2 px-3 text-right font-mono text-emerald-300">0.71y</td>
+      <td class="py-2 px-3 text-right font-mono text-cyan-300">0.48y</td>
+      <td class="py-2 px-3 text-right font-mono text-amber-300">1.27y</td>
+      <td class="py-2 px-3 text-right font-mono text-rose-300">4.98y</td>
+    </tr>
+    
+
+    <tr class="border-b border-gray-800">
+      <td class="py-2 px-3 text-gray-300">RFC -&gt; merge (LBS excluded)</td>
+      <td class="py-2 px-3 text-center text-gray-400">52</td>
+      <td class="py-2 px-3 text-right font-mono text-emerald-300">0.71y</td>
+      <td class="py-2 px-3 text-right font-mono text-cyan-300">0.47y</td>
+      <td class="py-2 px-3 text-right font-mono text-amber-300">1.29y</td>
+      <td class="py-2 px-3 text-right font-mono text-rose-300">4.98y</td>
+    </tr>
+    
+
+    <tr class="border-b border-gray-800">
+      <td class="py-2 px-3 text-gray-300">Merge -&gt; enterprise (all)</td>
+      <td class="py-2 px-3 text-center text-gray-400">44</td>
+      <td class="py-2 px-3 text-right font-mono text-emerald-300">2.24y</td>
+      <td class="py-2 px-3 text-right font-mono text-cyan-300">2.13y</td>
+      <td class="py-2 px-3 text-right font-mono text-amber-300">2.95y</td>
+      <td class="py-2 px-3 text-right font-mono text-rose-300">8.05y</td>
+    </tr>
+    
+
+    <tr class="border-b border-gray-800">
+      <td class="py-2 px-3 text-gray-300">RFC -&gt; enterprise (all)</td>
+      <td class="py-2 px-3 text-center text-gray-400">44</td>
+      <td class="py-2 px-3 text-right font-mono text-emerald-300">2.82y</td>
+      <td class="py-2 px-3 text-right font-mono text-cyan-300">2.59y</td>
+      <td class="py-2 px-3 text-right font-mono text-amber-300">4.29y</td>
+      <td class="py-2 px-3 text-right font-mono text-rose-300">8.09y</td>
+    </tr>
+    
+
+    <tr class="border-b border-gray-800">
+      <td class="py-2 px-3 text-gray-300">btrfs RFC -&gt; merge</td>
+      <td class="py-2 px-3 text-center text-gray-400">18</td>
+      <td class="py-2 px-3 text-right font-mono text-emerald-300">0.49y</td>
+      <td class="py-2 px-3 text-right font-mono text-cyan-300">0.3y</td>
+      <td class="py-2 px-3 text-right font-mono text-amber-300">0.96y</td>
+      <td class="py-2 px-3 text-right font-mono text-rose-300">1.51y</td>
+    </tr>
+    
+
+    <tr class="border-b border-gray-800">
+      <td class="py-2 px-3 text-gray-300">ext4 RFC -&gt; merge</td>
+      <td class="py-2 px-3 text-center text-gray-400">13</td>
+      <td class="py-2 px-3 text-right font-mono text-emerald-300">0.71y</td>
+      <td class="py-2 px-3 text-right font-mono text-cyan-300">0.49y</td>
+      <td class="py-2 px-3 text-right font-mono text-amber-300">1.12y</td>
+      <td class="py-2 px-3 text-right font-mono text-rose-300">3.12y</td>
+    </tr>
+    
+
+    <tr class="border-b border-gray-800">
+      <td class="py-2 px-3 text-gray-300">xfs RFC -&gt; merge</td>
+      <td class="py-2 px-3 text-center text-gray-400">24</td>
+      <td class="py-2 px-3 text-right font-mono text-emerald-300">0.89y</td>
+      <td class="py-2 px-3 text-right font-mono text-cyan-300">0.59y</td>
+      <td class="py-2 px-3 text-right font-mono text-amber-300">1.49y</td>
+      <td class="py-2 px-3 text-right font-mono text-rose-300">4.98y</td>
+    </tr>
+    
+
+    <tr class="border-b border-gray-800">
+      <td class="py-2 px-3 text-gray-300">mm_impact=none RFC -&gt; merge</td>
+      <td class="py-2 px-3 text-center text-gray-400">38</td>
+      <td class="py-2 px-3 text-right font-mono text-emerald-300">0.65y</td>
+      <td class="py-2 px-3 text-right font-mono text-cyan-300">0.35y</td>
+      <td class="py-2 px-3 text-right font-mono text-amber-300">1.24y</td>
+      <td class="py-2 px-3 text-right font-mono text-rose-300">4.98y</td>
+    </tr>
+    
+
+    <tr class="border-b border-gray-800">
+      <td class="py-2 px-3 text-gray-300">mm_impact=minor RFC -&gt; merge</td>
+      <td class="py-2 px-3 text-center text-gray-400">12</td>
+      <td class="py-2 px-3 text-right font-mono text-emerald-300">0.92y</td>
+      <td class="py-2 px-3 text-right font-mono text-cyan-300">0.86y</td>
+      <td class="py-2 px-3 text-right font-mono text-amber-300">1.29y</td>
+      <td class="py-2 px-3 text-right font-mono text-rose-300">3.12y</td>
+    </tr>
+    
+
+    <tr class="border-b border-gray-800">
+      <td class="py-2 px-3 text-gray-300">mm_impact=major RFC -&gt; merge</td>
+      <td class="py-2 px-3 text-center text-gray-400">5</td>
+      <td class="py-2 px-3 text-right font-mono text-emerald-300">0.68y</td>
+      <td class="py-2 px-3 text-right font-mono text-cyan-300">0.77y</td>
+      <td class="py-2 px-3 text-right font-mono text-amber-300">0.91y</td>
+      <td class="py-2 px-3 text-right font-mono text-rose-300">0.97y</td>
+    </tr>
+    
+          </tbody>
+        </table>
+      </div>
+
+      <div class="mt-6 card rounded-xl p-6">
+        <h3 class="font-semibold text-lg mb-3">What the numbers say</h3>
+        <p class="text-gray-300 text-sm mb-2">
+          Across 55 features for which both RFC and merge dates are
+          recorded, the median RFC-to-merge wall-clock is
+          <span class="font-mono text-cyan-300">0.48y</span> and
+          the mean is
+          <span class="font-mono text-emerald-300">0.71y</span>.
+          Removing LBS changes the global mean to
+          <span class="font-mono text-amber-300">0.71y</span> --
+          it is a small effect on the headline number because the RFC of the
+          successful 2023 LBS attempt landed in
+          <span class="font-mono text-emerald-300">0.97y</span>, well within the
+          per-feature range.
+        </p>
+        <p class="text-gray-300 text-sm mb-2">
+          LBS-on-XFS RFC-to-merge was <span class='font-mono text-emerald-300'>0.97y</span>, versus the mm-impact-major bucket mean of <span class='font-mono text-amber-300'>0.68y</span>.
+        </p>
+        <p class="text-gray-300 text-sm">
+          The interesting LBS number is not RFC-to-merge but
+          <strong>first-idea-to-merge</strong>: from Christoph Lameter's 2007
+          compound-page RFC through Nick Piggin's fsblock work, the 2017 LSFMM
+          revisit, Dave Chinner's 2018 attempt, and finally Pankaj Raghav's 2023
+          series, the total wall-clock is
+          <span class="font-mono text-rose-300">17.31y</span>. The 2023 attempt
+          is also the first one whose test surface was driven by kdevops with
+          AI-assisted triage rather than ad-hoc xfstests runs.
+        </p>
+      </div>
+    </section>
+
+    <section class="mb-14" id="lbs">
+      <div class="camp-header">
+        <h2 class="text-2xl font-bold">LBS biography</h2>
+        <p class="text-gray-500 text-sm mt-1">
+          Large Block Sizes is the only feature in the catalog with a multi-RFC
+          arc spanning a decade and a half. The chart records every attempt,
+          succeeded or not.
+        </p>
+      </div>
+
+      <div class="figure mb-6">
+        <img src="images/lbs_biography.png" alt="LBS biography timeline">
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-4 mb-6">
+        
+        <div class="card rounded-lg p-5 border-l-4 border-cyan-500">
+          <h3 class="font-semibold text-cyan-400 mb-2">XFS LBS</h3>
+          <p class="text-gray-400 text-xs mb-2">
+            RFC <span class="font-mono text-gray-300">2023-09-15</span>
+            -> merged <span class="font-mono text-gray-300">2024-09-03</span>
+            (vfs-6.12.blocksize)
+          </p>
+          <div class="grid grid-cols-2 gap-2 text-sm">
+            <div>
+              <div class="text-xs text-gray-500">RFC -> merge</div>
+              <div class="font-mono text-emerald-300 text-xl">
+                0.97y
+              </div>
+            </div>
+            <div>
+              <div class="text-xs text-gray-500">first idea -> merge</div>
+              <div class="font-mono text-amber-300 text-xl">
+                17.31y
+              </div>
+            </div>
+          </div>
+        </div>
+        
+
+        <div class="card rounded-lg p-5 border-l-4 border-emerald-500">
+          <h3 class="font-semibold text-emerald-400 mb-2">BTRFS LBS</h3>
+          <p class="text-gray-400 text-xs mb-2">
+            RFC <span class="font-mono text-gray-300">2024-11-27</span>
+            -> merged <span class="font-mono text-gray-300">2025-09-23</span>
+            (v6.18-rc1)
+          </p>
+          <div class="grid grid-cols-2 gap-2 text-sm">
+            <div>
+              <div class="text-xs text-gray-500">RFC -> merge</div>
+              <div class="font-mono text-emerald-300 text-xl">
+                0.82y
+              </div>
+            </div>
+            <div>
+              <div class="text-xs text-gray-500">first idea -> merge</div>
+              <div class="font-mono text-amber-300 text-xl">
+                18.36y
+              </div>
+            </div>
+          </div>
+        </div>
+        
+
+        <div class="card rounded-lg p-5 border-l-4 border-purple-500">
+          <h3 class="font-semibold text-purple-400 mb-2">EXT4 LBS</h3>
+          <p class="text-gray-400 text-xs mb-2">
+            RFC <span class="font-mono text-gray-300">2025-07-25</span>
+            -> merged <span class="font-mono text-gray-300">2025-11-28</span>
+            (v6.19-rc1)
+          </p>
+          <div class="grid grid-cols-2 gap-2 text-sm">
+            <div>
+              <div class="text-xs text-gray-500">RFC -> merge</div>
+              <div class="font-mono text-emerald-300 text-xl">
+                0.34y
+              </div>
+            </div>
+            <div>
+              <div class="text-xs text-gray-500">first idea -> merge</div>
+              <div class="font-mono text-amber-300 text-xl">
+                18.54y
+              </div>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+
+      <div class="card rounded-xl p-6">
+        <h3 class="font-semibold text-lg mb-3">After XFS, the runway opened</h3>
+        <p class="text-gray-300 text-sm mb-3">
+          The mm and iomap large-folio infrastructure that LBS-on-XFS forced into
+          existence was reused by ext4 and btrfs at much lower cost. Both
+          followed inside thirteen months:
+        </p>
+        <ul class="text-gray-400 text-sm space-y-1 ml-4 list-disc">
+          <li><strong>EXT4 LBS</strong> merged <span class="font-mono">2025-11-28</span>, <span class="text-amber-300">1.23y</span> after XFS LBS</li>
+<li><strong>BTRFS LBS</strong> merged <span class="font-mono">2025-09-23</span>, <span class="text-amber-300">1.05y</span> after XFS LBS</li>
+        </ul>
+      </div>
+
+      <div class="figure mt-6">
+        <img src="images/lbs_per_fs.png" alt="LBS adoption per fs">
+      </div>
+    </section>
+
+    <section class="mb-14" id="charts">
+      <div class="camp-header">
+        <h2 class="text-2xl font-bold">Charts</h2>
+        <p class="text-gray-500 text-sm mt-1">
+          PNG figures generated from the same JSON the report pulls from.
+        </p>
+      </div>
+
+      <div class="grid gap-6">
+        <div class="figure">
+          <h3 class="font-semibold text-lg mb-2">Feature lifecycle</h3>
+          <img src="images/timeline.png" alt="Timeline of features">
+        </div>
+        <div class="figure">
+          <h3 class="font-semibold text-lg mb-2">RFC -> merge per feature</h3>
+          <img src="images/rfc_to_merge_bars.png" alt="RFC to merge bar chart">
+        </div>
+        <div class="figure">
+          <h3 class="font-semibold text-lg mb-2">Merge -> first enterprise enablement</h3>
+          <img src="images/merge_to_enterprise.png" alt="Merge to enterprise bar chart">
+        </div>
+        <div class="figure">
+          <h3 class="font-semibold text-lg mb-2">By mm-impact bucket</h3>
+          <img src="images/mm_impact_compare.png" alt="mm-impact comparison">
+        </div>
+        <div class="figure">
+          <h3 class="font-semibold text-lg mb-2">Post-merge Fixes-tag fan-out</h3>
+          <img src="images/fixes_distribution.png" alt="Fixes-tag distribution">
+        </div>
+      </div>
+    </section>
+
+    
+        <section class="mb-14" id="xfs">
+          <div class="camp-header">
+            <h2 class="text-2xl font-bold">XFS</h2>
+            <p class="text-gray-500 text-sm mt-1">
+              24 features catalogued, ordered by RFC date.
+            </p>
+          </div>
+          <div class="grid gap-4">
+            
+    <div class="card rounded-lg p-5 border-l-4 border-cyan-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-cyan-400">Delayed logging</h3>
+        <span class="text-xs bg-cyan-900 text-cyan-300 px-2 py-1 rounded">xfs</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">Reworks XFS journaling to delay log buffer writes, batching changes and dramatically reducing journal I/O on metadata-heavy workloads. The replacement for the original transaction model and the foundation for everything that came after on the log.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lwn.net/Articles/364411/" class="hover:underline">2009-12-01</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2010-05-24 (v2.6.35-rc1)</div>
+        <div><span class="text-gray-500">SUSE:</span> SLE 11 SP2</div>
+        <div><span class="text-gray-500">RHEL:</span> RHEL 7.0</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 0.48y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> 1.75y</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded">
+            none
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 1
+          <span class="text-gray-600"> (11.09y)</span>
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-cyan-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-cyan-400">v5 superblock with CRC self-describing metadata</h3>
+        <span class="text-xs bg-cyan-900 text-cyan-300 px-2 py-1 rounded">xfs</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">XFS_SB_VERSION_5 format with CRC32c protection on every metadata block, owner/UUID stamps, and self-describing block headers. Foundation for every later feature bit and required for online scrub/repair.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lwn.net/Articles/521893/" class="hover:underline">2012-11-08</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2013-04-27 (v3.10-rc1)</div>
+        <div><span class="text-gray-500">SUSE:</span> SLE 12</div>
+        <div><span class="text-gray-500">RHEL:</span> RHEL 7.3</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 0.47y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> 1.5y</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded">
+            none
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 0
+          
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-cyan-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-cyan-400">Filetype in directory entries</h3>
+        <span class="text-xs bg-cyan-900 text-cyan-300 px-2 py-1 rounded">xfs</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">INCOMPAT_FTYPE records inode type in directory entries to avoid readdir stat() back-references. Standard POSIX-quality readdir performance.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lore.kernel.org/linux-xfs/1374793706-23339-1-git-send-email-david@fromorbit.com/" class="hover:underline">2013-07-25</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2013-08-22 (v3.12-rc1)</div>
+        <div><span class="text-gray-500">SUSE:</span> SLE 12 SP1</div>
+        <div><span class="text-gray-500">RHEL:</span> RHEL 7.3</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 0.08y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> 2.31y</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded">
+            none
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 0
+          
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-cyan-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-cyan-400">Free inode btree (finobt)</h3>
+        <span class="text-xs bg-cyan-900 text-cyan-300 px-2 py-1 rounded">xfs</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">RO_COMPAT_FINOBT adds a btree of free inode chunks distinct from the inode btree, dramatically accelerating inode allocation on aged filesystems.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lore.kernel.org/linux-xfs/1386930245-32593-1-git-send-email-bfoster@redhat.com/" class="hover:underline">2013-12-12</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2014-04-24 (v3.16-rc1)</div>
+        <div><span class="text-gray-500">SUSE:</span> SLE 12 SP1</div>
+        <div><span class="text-gray-500">RHEL:</span> RHEL 7.3</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 0.36y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> 1.64y</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded">
+            none
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 0
+          
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-cyan-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-cyan-400">pNFS layout</h3>
+        <span class="text-xs bg-cyan-900 text-cyan-300 px-2 py-1 rounded">xfs</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">Block-layout pNFS server export operations for XFS, enabling clients to perform direct device I/O bypassing the NFS data server.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lwn.net/Articles/593420/" class="hover:underline">2014-04-15</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2015-02-16 (v4.0-rc1)</div>
+        <div><span class="text-gray-500">SUSE:</span> SLE 12 SP2</div>
+        <div><span class="text-gray-500">RHEL:</span> -</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 0.84y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> 1.72y</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded">
+            none
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 1
+          <span class="text-gray-600"> (5.74y)</span>
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-cyan-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-cyan-400">DAX support</h3>
+        <span class="text-xs bg-cyan-900 text-cyan-300 px-2 py-1 rounded">xfs</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">Direct access to persistent memory bypassing the page cache. Required substantial mm changes for devmap pages and per-inode DAX state.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lwn.net/Articles/610174/" class="hover:underline">2014-08-26</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2015-06-04 (v4.2-rc1)</div>
+        <div><span class="text-gray-500">SUSE:</span> SLE 12 SP2</div>
+        <div><span class="text-gray-500">RHEL:</span> RHEL 7.6</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 0.77y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> 1.43y</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-rose-900 text-rose-300 px-1.5 py-0.5 rounded">
+            major
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 0
+          
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-cyan-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-cyan-400">Sparse inodes</h3>
+        <span class="text-xs bg-cyan-900 text-cyan-300 px-2 py-1 rounded">xfs</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">INCOMPAT_SPINODES allows inode chunks to be sparse rather than fixed 64-inode aligned, dramatically improving inode allocation on small or fragmented filesystems.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lore.kernel.org/linux-xfs/1422308839-22759-1-git-send-email-bfoster@redhat.com/" class="hover:underline">2015-01-26</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2015-05-29 (v4.2-rc1)</div>
+        <div><span class="text-gray-500">SUSE:</span> SLE 12 SP3</div>
+        <div><span class="text-gray-500">RHEL:</span> RHEL 7.5</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 0.34y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> 2.28y</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded">
+            none
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 0
+          
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-cyan-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-cyan-400">Metadata UUID</h3>
+        <span class="text-xs bg-cyan-900 text-cyan-300 px-2 py-1 rounded">xfs</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">INCOMPAT_META_UUID separates the UUID stamped in metadata blocks from the user-visible UUID, allowing UUID change without rewriting metadata.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lore.kernel.org/linux-xfs/1430330537-30884-1-git-send-email-dchinner@redhat.com/" class="hover:underline">2015-04-29</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2015-07-29 (v4.3-rc1)</div>
+        <div><span class="text-gray-500">SUSE:</span> SLE 12 SP3</div>
+        <div><span class="text-gray-500">RHEL:</span> RHEL 7.5</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 0.25y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> 2.11y</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded">
+            none
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 1
+          <span class="text-gray-600"> (6.4y)</span>
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-cyan-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-cyan-400">Reverse mapping btree (rmapbt)</h3>
+        <span class="text-xs bg-cyan-900 text-cyan-300 px-2 py-1 rounded">xfs</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">RO_COMPAT_RMAPBT records the owner of every allocated extent, enabling reflink, online repair, and forward/reverse extent walking.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lore.kernel.org/linux-xfs/20151012211437.GD8541@birch.djwong.org/" class="hover:underline">2015-10-12</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2016-08-03 (v4.8-rc1)</div>
+        <div><span class="text-gray-500">SUSE:</span> SLE 15</div>
+        <div><span class="text-gray-500">RHEL:</span> RHEL 8.0</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 0.81y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> 1.95y</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded">
+            none
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 0
+          
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-cyan-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-cyan-400">Reflinks (shared data extents)</h3>
+        <span class="text-xs bg-cyan-900 text-cyan-300 px-2 py-1 rounded">xfs</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">RO_COMPAT_REFLINK adds CoW shared data extents using refcount btrees, enabling cp --reflink and dedup. The user-visible payoff of rmapbt.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lore.kernel.org/linux-xfs/20151116042916.GA20587@birch.djwong.org/" class="hover:underline">2015-11-16</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2016-10-03 (v4.9-rc1)</div>
+        <div><span class="text-gray-500">SUSE:</span> SLE 15 SP1</div>
+        <div><span class="text-gray-500">RHEL:</span> RHEL 8.0</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 0.88y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> 2.59y</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-orange-900 text-orange-300 px-1.5 py-0.5 rounded">
+            minor
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 0
+          
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-cyan-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-cyan-400">Online scrub</h3>
+        <span class="text-xs bg-cyan-900 text-cyan-300 px-2 py-1 rounded">xfs</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">XFS_IOC_SCRUB_METADATA ioctl plus the in-kernel scrub infrastructure that validates metadata consistency on a live filesystem.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lore.kernel.org/linux-xfs/149198739430.10989.13989413268717081807.stgit@birch.djwong.org/" class="hover:underline">2017-04-13</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2017-10-26 (v4.15-rc1)</div>
+        <div><span class="text-gray-500">SUSE:</span> SLE 15 SP2</div>
+        <div><span class="text-gray-500">RHEL:</span> RHEL 8.4</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 0.54y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> 2.74y</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded">
+            none
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 0
+          
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-cyan-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-cyan-400">Swap files</h3>
+        <span class="text-xs bg-cyan-900 text-cyan-300 px-2 py-1 rounded">xfs</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">swap_activate via iomap, finally allowing /swapfile on XFS without bmap quirks.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lwn.net/Articles/750946/" class="hover:underline">2018-04-08</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2018-05-15 (v4.18-rc1)</div>
+        <div><span class="text-gray-500">SUSE:</span> SLE 15 SP1</div>
+        <div><span class="text-gray-500">RHEL:</span> RHEL 8.1</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 0.1y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> 1.11y</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-orange-900 text-orange-300 px-1.5 py-0.5 rounded">
+            minor
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 1
+          <span class="text-gray-600"> (3.26y)</span>
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-cyan-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-cyan-400">Online repair</h3>
+        <span class="text-xs bg-cyan-900 text-cyan-300 px-2 py-1 rounded">xfs</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">In-kernel metadata repair distinct from scrub: actually fixes detected damage on a live filesystem.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lore.kernel.org/linux-xfs/152506812708.7273.3893519080099268929.stgit@magnolia/" class="hover:underline">2018-04-30</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2018-05-15 (v4.18-rc1)</div>
+        <div><span class="text-gray-500">SUSE:</span> SUSE 16.0</div>
+        <div><span class="text-gray-500">RHEL:</span> -</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 0.04y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> 8.05y</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded">
+            none
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 0
+          
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-cyan-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-cyan-400">iomap buffered I/O conversion</h3>
+        <span class="text-xs bg-cyan-900 text-cyan-300 px-2 py-1 rounded">xfs</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">XFS writeback path lifted to iomap, dropping the buffer_head dependency on the buffered I/O path. Foundation for large folios in the page cache and LBS.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lore.kernel.org/linux-xfs/20180925095828.31790-1-hch@lst.de/" class="hover:underline">2018-09-25</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2019-10-21 (v5.5-rc1)</div>
+        <div><span class="text-gray-500">SUSE:</span> SLE 15 SP2</div>
+        <div><span class="text-gray-500">RHEL:</span> RHEL 9.0</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 1.07y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> 0.75y</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-orange-900 text-orange-300 px-1.5 py-0.5 rounded">
+            minor
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 2
+          <span class="text-gray-600"> (6.37y)</span>
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-cyan-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-cyan-400">Parent pointers</h3>
+        <span class="text-xs bg-cyan-900 text-cyan-300 px-2 py-1 rounded">xfs</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">INCOMPAT_PARENT stores parent directory inode references in extended attributes, making path reconstruction and online repair tractable without scrubbing the directory tree.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lore.kernel.org/linux-xfs/20190501175650.18943-1-allison.henderson@oracle.com/" class="hover:underline">2019-05-01</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2024-04-23 (vfs-6.10-rc2.fixes)</div>
+        <div><span class="text-gray-500">SUSE:</span> -</div>
+        <div><span class="text-gray-500">RHEL:</span> -</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 4.98y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> -</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded">
+            none
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 0
+          
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-cyan-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-cyan-400">Delayed attributes (log_xattrs)</h3>
+        <span class="text-xs bg-cyan-900 text-cyan-300 px-2 py-1 rounded">xfs</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">INCOMPAT_LOG_XATTRS adds delayed attribute changes journaled through intent logging, removing the need for the old transaction-roll dance for xattr updates and unblocking parent pointers and online repair.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lore.kernel.org/linux-xfs/156460213330.9596.10833148540898037537.stgit@magnolia/" class="hover:underline">2019-07-31</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2022-05-09 (v5.19-rc1)</div>
+        <div><span class="text-gray-500">SUSE:</span> SLE 15 SP6</div>
+        <div><span class="text-gray-500">RHEL:</span> -</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 2.77y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> 2.1y</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded">
+            none
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 0
+          
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-cyan-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-cyan-400">Inobt block count (inobtcount)</h3>
+        <span class="text-xs bg-cyan-900 text-cyan-300 px-2 py-1 rounded">xfs</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">RO_COMPAT_INOBTCNT caches inode-btree block counts in the AGI header to speed up mount-time AG header parsing.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lore.kernel.org/linux-xfs/159062164802.7037.8862739410601611891.stgit@magnolia/" class="hover:underline">2020-05-27</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2020-09-15 (v5.10-rc1)</div>
+        <div><span class="text-gray-500">SUSE:</span> SLE 15 SP4</div>
+        <div><span class="text-gray-500">RHEL:</span> RHEL 9.0</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 0.3y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> 1.67y</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded">
+            none
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 0
+          
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-cyan-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-cyan-400">Year-2038-safe timestamps (bigtime)</h3>
+        <span class="text-xs bg-cyan-900 text-cyan-300 px-2 py-1 rounded">xfs</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">INCOMPAT_BIGTIME extends the on-disk timestamp epoch beyond 2038 by reinterpreting the seconds field as unsigned nanoseconds since 1901.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lore.kernel.org/linux-xfs/159354006830.778078.7574180023800538019.stgit@magnolia/" class="hover:underline">2020-06-30</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2020-09-15 (v5.10-rc1)</div>
+        <div><span class="text-gray-500">SUSE:</span> SLE 15 SP4</div>
+        <div><span class="text-gray-500">RHEL:</span> RHEL 9.0</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 0.21y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> 1.67y</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded">
+            none
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 0
+          
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-cyan-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-cyan-400">Needs-repair feature bit</h3>
+        <span class="text-xs bg-cyan-900 text-cyan-300 px-2 py-1 rounded">xfs</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">INCOMPAT_NEEDSREPAIR marks a filesystem as requiring xfs_repair before further use, used by online repair to fence partially-repaired metadata.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lore.kernel.org/linux-xfs/159916263611.1990062.16728770486024498389.stgit@magnolia/" class="hover:underline">2020-08-31</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2020-12-09 (v5.11-rc1)</div>
+        <div><span class="text-gray-500">SUSE:</span> SLE 15 SP4</div>
+        <div><span class="text-gray-500">RHEL:</span> RHEL 9.0</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 0.27y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> 1.43y</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded">
+            none
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 0
+          
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-cyan-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-cyan-400">Large extent counts (nrext64)</h3>
+        <span class="text-xs bg-cyan-900 text-cyan-300 px-2 py-1 rounded">xfs</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">INCOMPAT_NREXT64 widens on-disk extent count fields to 64 bits, removing the 4 billion data extent limit per inode.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lore.kernel.org/linux-xfs/20210819140440.1737888-1-chandanrlinux@gmail.com/" class="hover:underline">2021-08-19</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2022-04-11 (v5.19-rc1)</div>
+        <div><span class="text-gray-500">SUSE:</span> SLE 15 SP6</div>
+        <div><span class="text-gray-500">RHEL:</span> -</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 0.64y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> 2.17y</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded">
+            none
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 0
+          
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-cyan-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-cyan-400">Atomic exchange-range</h3>
+        <span class="text-xs bg-cyan-900 text-cyan-300 px-2 py-1 rounded">xfs</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">INCOMPAT_EXCHRANGE adds an atomic file range exchange operation, the building block for xfs_io exchangerange and metadirectory swap, plus the file-side of atomic writes.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lore.kernel.org/linux-xfs/167247415779.1576794.13036985210127587870.stgit@magnolia/" class="hover:underline">2022-12-30</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2024-04-15 (vfs-6.10-rc2.fixes)</div>
+        <div><span class="text-gray-500">SUSE:</span> -</div>
+        <div><span class="text-gray-500">RHEL:</span> -</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 1.29y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> -</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-orange-900 text-orange-300 px-1.5 py-0.5 rounded">
+            minor
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 0
+          
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-cyan-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-cyan-400">Metadata directory tree</h3>
+        <span class="text-xs bg-cyan-900 text-cyan-300 px-2 py-1 rounded">xfs</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">INCOMPAT_METADIR moves quota, rt summary, and rt bitmap inodes into a dedicated metadata directory tree, unblocking realtime groups and metadata-only btree types.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lore.kernel.org/linux-xfs/168091075974.708989.4732533495568091293.stgit@frogsfrogsfrogs/" class="hover:underline">2023-04-07</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2024-11-05 (vfs-6.13.exec.deny_write_access.revert)</div>
+        <div><span class="text-gray-500">SUSE:</span> -</div>
+        <div><span class="text-gray-500">RHEL:</span> -</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 1.58y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> -</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded">
+            none
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 0
+          
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-cyan-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-cyan-400">Large Block Sizes (LBS)<span class="ml-2 px-2 py-0.5 text-xs rounded bg-yellow-900 text-yellow-300">LBS</span></h3>
+        <span class="text-xs bg-cyan-900 text-cyan-300 px-2 py-1 rounded">xfs</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">Filesystem block size larger than PAGE_SIZE on XFS, enabled by a multi-year stack of mm and iomap changes: large folios, mapping_set_folio_min_order, FS_LBS gating, and an LBS-aware block layer. The first XFS feature whose schedule visibly accelerated under kdevops-driven automated testing.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lore.kernel.org/all/20230915183848.1018717-1-kernel@pankajraghav.com/" class="hover:underline">2023-09-15</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2024-09-03 (vfs-6.12.blocksize)</div>
+        <div><span class="text-gray-500">SUSE:</span> SUSE 16.0</div>
+        <div><span class="text-gray-500">RHEL:</span> RHEL 10.0</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 0.97y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> 0.71y</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-rose-900 text-rose-300 px-1.5 py-0.5 rounded">
+            major
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 2
+          <span class="text-gray-600"> (1.17y)</span>
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-cyan-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-cyan-400">Zoned realtime allocator</h3>
+        <span class="text-xs bg-cyan-900 text-cyan-300 px-2 py-1 rounded">xfs</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">INCOMPAT_ZONED arranges the realtime device into zones for SMR/ZNS devices, with garbage collection and per-zone metadata.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lore.kernel.org/linux-xfs/20231204190915.1056-1-hch@lst.de/" class="hover:underline">2023-12-04</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2025-03-03 (v6.15-rc1)</div>
+        <div><span class="text-gray-500">SUSE:</span> -</div>
+        <div><span class="text-gray-500">RHEL:</span> -</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 1.25y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> -</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-orange-900 text-orange-300 px-1.5 py-0.5 rounded">
+            minor
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 2
+          <span class="text-gray-600"> (0.79y)</span>
+        </div>
+      </div>
+    </div>
+    
+          </div>
+        </section>
+        
+        <section class="mb-14" id="ext4">
+          <div class="camp-header">
+            <h2 class="text-2xl font-bold">ext4</h2>
+            <p class="text-gray-500 text-sm mt-1">
+              13 features catalogued, ordered by RFC date.
+            </p>
+          </div>
+          <div class="grid gap-4">
+            
+    <div class="card rounded-lg p-5 border-l-4 border-purple-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-purple-400">Extents and 64-bit</h3>
+        <span class="text-xs bg-purple-900 text-purple-300 px-2 py-1 rounded">ext4</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">INCOMPAT_EXTENTS and INCOMPAT_64BIT, ext4&#x27;s two defining feature bits over ext3: extent-mapped allocation instead of indirect blocks, and 48-bit physical block addressing.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lwn.net/Articles/187321/" class="hover:underline">2006-06-22</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2006-10-11 (v2.6.19-rc2)</div>
+        <div><span class="text-gray-500">SUSE:</span> SLE 11</div>
+        <div><span class="text-gray-500">RHEL:</span> RHEL 6.0</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 0.3y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> 2.45y</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded">
+            none
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 0
+          
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-purple-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-purple-400">Multi-block allocator</h3>
+        <span class="text-xs bg-purple-900 text-purple-300 px-2 py-1 rounded">ext4</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">Buddy-allocator-style multi-block allocator replacing ext3&#x27;s single-block allocator. Required for usable performance once extents arrived.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lore.kernel.org/linux-ext4/1187028113-26611-1-git-send-email-aneesh.kumar@linux.vnet.ibm.com/" class="hover:underline">2007-08-13</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2008-01-29 (v2.6.25-rc1)</div>
+        <div><span class="text-gray-500">SUSE:</span> SLE 11</div>
+        <div><span class="text-gray-500">RHEL:</span> RHEL 6.0</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 0.46y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> 1.15y</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded">
+            none
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 4
+          <span class="text-gray-600"> (17.83y)</span>
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-purple-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-purple-400">Metadata checksums</h3>
+        <span class="text-xs bg-purple-900 text-purple-300 px-2 py-1 rounded">ext4</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">RO_COMPAT_METADATA_CSUM adds CRC32c protection on inodes, block group descriptors, journal blocks, and other metadata.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lore.kernel.org/linux-ext4/1324360801-25881-1-git-send-email-tytso@mit.edu/" class="hover:underline">2011-12-19</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2012-01-04 (v3.3-rc1)</div>
+        <div><span class="text-gray-500">SUSE:</span> SLE 12</div>
+        <div><span class="text-gray-500">RHEL:</span> RHEL 7.3</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 0.04y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> 2.81y</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded">
+            none
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 0
+          
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-purple-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-purple-400">Inline data</h3>
+        <span class="text-xs bg-purple-900 text-purple-300 px-2 py-1 rounded">ext4</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">INCOMPAT_INLINE_DATA stores small file contents inside the inode body, skipping a block allocation for tiny files.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lore.kernel.org/linux-ext4/1339578893-3060-1-git-send-email-tao.ma@canonical.com/" class="hover:underline">2012-06-13</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2012-12-10 (v3.8-rc1)</div>
+        <div><span class="text-gray-500">SUSE:</span> SLE 12</div>
+        <div><span class="text-gray-500">RHEL:</span> RHEL 7.0</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 0.49y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> 1.5y</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded">
+            none
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 1
+          <span class="text-gray-600"> (4.0y)</span>
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-purple-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-purple-400">DAX support</h3>
+        <span class="text-xs bg-purple-900 text-purple-300 px-2 py-1 rounded">ext4</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">Direct access to persistent memory, mirroring the XFS DAX work. Shared most of its mm/ infrastructure with the XFS path.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lwn.net/Articles/610174/" class="hover:underline">2014-08-26</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2015-02-16 (v4.0-rc1)</div>
+        <div><span class="text-gray-500">SUSE:</span> SLE 12 SP2</div>
+        <div><span class="text-gray-500">RHEL:</span> RHEL 7.6</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 0.48y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> 1.72y</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-rose-900 text-rose-300 px-1.5 py-0.5 rounded">
+            major
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 0
+          
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-purple-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-purple-400">Encryption (fscrypt)</h3>
+        <span class="text-xs bg-purple-900 text-purple-300 px-2 py-1 rounded">ext4</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">INCOMPAT_ENCRYPT adds per-file content and filename encryption with policies stored as extended attributes. ext4 led; later generalized as fscrypt.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lore.kernel.org/linux-ext4/1420591493-26473-1-git-send-email-mhalcrow@google.com/" class="hover:underline">2015-01-06</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2015-01-19 (v4.0-rc1)</div>
+        <div><span class="text-gray-500">SUSE:</span> SLE 15</div>
+        <div><span class="text-gray-500">RHEL:</span> RHEL 8.0</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 0.04y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> 3.49y</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-orange-900 text-orange-300 px-1.5 py-0.5 rounded">
+            minor
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 0
+          
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-purple-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-purple-400">iomap conversion (direct I/O)</h3>
+        <span class="text-xs bg-purple-900 text-purple-300 px-2 py-1 rounded">ext4</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">Direct I/O path lifted to iomap, replacing the legacy ext4 DIO machinery and improving large-IO performance.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lore.kernel.org/linux-ext4/20160922070856.31094-1-jaegeuk@kernel.org/" class="hover:underline">2016-09-22</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2019-11-05 (v5.5-rc1)</div>
+        <div><span class="text-gray-500">SUSE:</span> SLE 15 SP4</div>
+        <div><span class="text-gray-500">RHEL:</span> RHEL 9.0</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 3.12y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> 2.53y</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-orange-900 text-orange-300 px-1.5 py-0.5 rounded">
+            minor
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 4
+          <span class="text-gray-600"> (3.99y)</span>
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-purple-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-purple-400">fs-verity</h3>
+        <span class="text-xs bg-purple-900 text-purple-300 px-2 py-1 rounded">ext4</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">RO_COMPAT_VERITY adds Merkle-tree-based file integrity verification, designed for read-only system images on Android.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lore.kernel.org/linux-fsdevel/20180531222456.93384-1-ebiggers@kernel.org/" class="hover:underline">2018-05-31</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2019-08-12 (v5.4-rc1)</div>
+        <div><span class="text-gray-500">SUSE:</span> SLE 15 SP3</div>
+        <div><span class="text-gray-500">RHEL:</span> RHEL 9.0</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 1.2y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> 1.86y</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-orange-900 text-orange-300 px-1.5 py-0.5 rounded">
+            minor
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 2
+          <span class="text-gray-600"> (3.32y)</span>
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-purple-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-purple-400">Case-folded directories</h3>
+        <span class="text-xs bg-purple-900 text-purple-300 px-2 py-1 rounded">ext4</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">INCOMPAT_CASEFOLD stores a charset encoding in the superblock so directory lookups can be performed case-insensitively without touching VFS.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lore.kernel.org/linux-ext4/20180921203942.13770-1-krisman@collabora.co.uk/" class="hover:underline">2018-09-21</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2019-04-25 (v5.2-rc1)</div>
+        <div><span class="text-gray-500">SUSE:</span> SLE 15 SP3</div>
+        <div><span class="text-gray-500">RHEL:</span> RHEL 9.0</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 0.59y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> 2.16y</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded">
+            none
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 0
+          
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-purple-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-purple-400">Fast commit</h3>
+        <span class="text-xs bg-purple-900 text-purple-300 px-2 py-1 rounded">ext4</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">INCOMPAT_FAST_COMMIT adds a small per-fsync log next to the main journal that records only the changes needed to recover the most recent operations, dramatically reducing fsync latency.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lore.kernel.org/linux-ext4/20191231170711.6451-1-harshadshirwadkar@gmail.com/" class="hover:underline">2019-12-31</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2020-10-21 (v5.10-rc1)</div>
+        <div><span class="text-gray-500">SUSE:</span> SLE 15 SP6</div>
+        <div><span class="text-gray-500">RHEL:</span> -</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 0.81y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> 3.64y</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded">
+            none
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 2
+          <span class="text-gray-600"> (2.35y)</span>
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-purple-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-purple-400">Orphan file</h3>
+        <span class="text-xs bg-purple-900 text-purple-300 px-2 py-1 rounded">ext4</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">COMPAT_ORPHAN_FILE replaces the in-superblock orphan inode list with a dedicated file, fixing a long-standing serialization bottleneck on truncate/unlink-heavy workloads.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lore.kernel.org/linux-ext4/20201208122026.11383-1-jack@suse.cz/" class="hover:underline">2020-12-08</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2021-08-30 (v5.15-rc1)</div>
+        <div><span class="text-gray-500">SUSE:</span> SLE 15 SP6</div>
+        <div><span class="text-gray-500">RHEL:</span> -</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 0.73y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> 2.79y</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded">
+            none
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 3
+          <span class="text-gray-600"> (4.07y)</span>
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-purple-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-purple-400">Multi-fsblock atomic writes</h3>
+        <span class="text-xs bg-purple-900 text-purple-300 px-2 py-1 rounded">ext4</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">Atomic write support for ext4 using bigalloc, exposing the device&#x27;s atomic write unit through the statx unit-max-opt field.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lore.kernel.org/linux-ext4/20240923144042.1535018-1-john.g.garry@oracle.com/" class="hover:underline">2024-09-23</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2025-05-20 (vfs-6.16-rc3.fixes)</div>
+        <div><span class="text-gray-500">SUSE:</span> -</div>
+        <div><span class="text-gray-500">RHEL:</span> -</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 0.65y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> -</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-orange-900 text-orange-300 px-1.5 py-0.5 rounded">
+            minor
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 0
+          
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-purple-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-purple-400">Large Block Sizes (LBS)<span class="ml-2 px-2 py-0.5 text-xs rounded bg-yellow-900 text-yellow-300">LBS</span></h3>
+        <span class="text-xs bg-purple-900 text-purple-300 px-2 py-1 rounded">ext4</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">Block sizes larger than PAGE_SIZE on ext4. Lands after XFS once the underlying mm and iomap large-folio infrastructure was already in place.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lore.kernel.org/linux-ext4/20250725-large-block-ext4-v1-0-23eaaff7d8ca@kernel.org/" class="hover:underline">2025-07-25</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2025-11-28 (v6.19-rc1)</div>
+        <div><span class="text-gray-500">SUSE:</span> -</div>
+        <div><span class="text-gray-500">RHEL:</span> -</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 0.34y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> -</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-rose-900 text-rose-300 px-1.5 py-0.5 rounded">
+            major
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 0
+          
+        </div>
+      </div>
+    </div>
+    
+          </div>
+        </section>
+        
+        <section class="mb-14" id="btrfs">
+          <div class="camp-header">
+            <h2 class="text-2xl font-bold">btrfs</h2>
+            <p class="text-gray-500 text-sm mt-1">
+              18 features catalogued, ordered by RFC date.
+            </p>
+          </div>
+          <div class="grid gap-4">
+            
+    <div class="card rounded-lg p-5 border-l-4 border-emerald-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-emerald-400">Mixed block groups</h3>
+        <span class="text-xs bg-emerald-900 text-emerald-300 px-2 py-1 rounded">btrfs</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">INCOMPAT_MIXED_GROUPS lets a single block group hold both data and metadata extents, useful for tiny filesystems.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lore.kernel.org/linux-btrfs/AANLkTi=ApRgi6OYHJ3OuLqsq-7tcKbWk0bjkkqypxR8u@mail.gmail.com/" class="hover:underline">2010-09-22</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2010-10-29 (v2.6.37-rc1)</div>
+        <div><span class="text-gray-500">SUSE:</span> SLE 11 SP3</div>
+        <div><span class="text-gray-500">RHEL:</span> -</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 0.1y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> 2.67y</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded">
+            none
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 0
+          
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-emerald-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-emerald-400">LZO compression</h3>
+        <span class="text-xs bg-emerald-900 text-emerald-300 px-2 py-1 rounded">btrfs</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">Adds LZO as an alternative compression codec alongside zlib for the existing INCOMPAT_COMPRESS_LZO bit, trading compression ratio for CPU.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lore.kernel.org/linux-btrfs/1286606155-9117-1-git-send-email-lli_nca@163.com/" class="hover:underline">2010-10-08</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2010-12-22 (v2.6.38-rc1)</div>
+        <div><span class="text-gray-500">SUSE:</span> SLE 11 SP3</div>
+        <div><span class="text-gray-500">RHEL:</span> -</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 0.21y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> 2.53y</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded">
+            none
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 0
+          
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-emerald-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-emerald-400">Quotas / qgroups</h3>
+        <span class="text-xs bg-emerald-900 text-emerald-300 px-2 py-1 rounded">btrfs</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">Subvolume-level quota groups with hierarchical accounting and exclusive/shared usage tracking.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lore.kernel.org/linux-btrfs/1315996902-19420-1-git-send-email-arne.jansen@gmx.net/" class="hover:underline">2011-09-14</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2012-07-12 (v3.6-rc1)</div>
+        <div><span class="text-gray-500">SUSE:</span> SLE 12</div>
+        <div><span class="text-gray-500">RHEL:</span> -</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 0.83y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> 2.29y</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded">
+            none
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 2
+          <span class="text-gray-600"> (10.93y)</span>
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-emerald-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-emerald-400">RAID 5/6</h3>
+        <span class="text-xs bg-emerald-900 text-emerald-300 px-2 py-1 rounded">btrfs</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">INCOMPAT_RAID56 adds parity RAID 5/6 to btrfs&#x27;s multi-device layer. Famously took years to stabilize.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lore.kernel.org/linux-btrfs/1323959478-15066-1-git-send-email-dmonakhov@openvz.org/" class="hover:underline">2011-12-15</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2013-02-01 (v3.9-rc1)</div>
+        <div><span class="text-gray-500">SUSE:</span> -</div>
+        <div><span class="text-gray-500">RHEL:</span> -</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 1.13y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> -</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded">
+            none
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 0
+          
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-emerald-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-emerald-400">Send / receive</h3>
+        <span class="text-xs bg-emerald-900 text-emerald-300 px-2 py-1 rounded">btrfs</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">Send a serialized stream describing a subvolume, with full and incremental variants, plus a kernel receive path. Foundation for btrfs replication.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lore.kernel.org/linux-btrfs/1334260411-7321-1-git-send-email-asj@strato.de/" class="hover:underline">2012-04-12</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2012-07-25 (v3.6-rc1)</div>
+        <div><span class="text-gray-500">SUSE:</span> SLE 12</div>
+        <div><span class="text-gray-500">RHEL:</span> -</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 0.28y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> 2.26y</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded">
+            none
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 1
+          <span class="text-gray-600"> (11.33y)</span>
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-emerald-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-emerald-400">Extended iref / hardlinks</h3>
+        <span class="text-xs bg-emerald-900 text-emerald-300 px-2 py-1 rounded">btrfs</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">INCOMPAT_EXTENDED_IREF removes btrfs&#x27;s old hardlink-per-directory limit by allowing multiple iref entries per inode.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lore.kernel.org/linux-btrfs/1339614884-22641-1-git-send-email-mfasheh@suse.com/" class="hover:underline">2012-06-13</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2012-10-09 (v3.7-rc1)</div>
+        <div><span class="text-gray-500">SUSE:</span> SLE 12</div>
+        <div><span class="text-gray-500">RHEL:</span> -</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 0.32y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> 2.05y</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded">
+            none
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 2
+          <span class="text-gray-600"> (12.78y)</span>
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-emerald-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-emerald-400">No-holes</h3>
+        <span class="text-xs bg-emerald-900 text-emerald-300 px-2 py-1 rounded">btrfs</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">INCOMPAT_NO_HOLES drops the file_extent_item placeholder records for holes in sparse files, reducing metadata size.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lore.kernel.org/linux-btrfs/1408455614-31530-1-git-send-email-fdmanana@suse.com/" class="hover:underline">2014-08-19</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2015-07-11 (v4.2-rc3)</div>
+        <div><span class="text-gray-500">SUSE:</span> SLE 15</div>
+        <div><span class="text-gray-500">RHEL:</span> -</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 0.89y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> 3.01y</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded">
+            none
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 0
+          
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-emerald-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-emerald-400">Free space tree (space_cache=v2)</h3>
+        <span class="text-xs bg-emerald-900 text-emerald-300 px-2 py-1 rounded">btrfs</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">COMPAT_RO_FREE_SPACE_TREE replaces the legacy free-space cache file with a btree, fixing recovery and mount-time consistency issues.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lore.kernel.org/linux-btrfs/1442984729-13030-1-git-send-email-osandov@osandov.com/" class="hover:underline">2015-09-23</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2015-12-17 (v4.5-rc1)</div>
+        <div><span class="text-gray-500">SUSE:</span> SLE 15 SP2</div>
+        <div><span class="text-gray-500">RHEL:</span> -</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 0.23y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> 4.59y</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded">
+            none
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 0
+          
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-emerald-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-emerald-400">zstd compression</h3>
+        <span class="text-xs bg-emerald-900 text-emerald-300 px-2 py-1 rounded">btrfs</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">zstd added as the third compression algorithm, providing better ratio than lzo and faster decompression than zlib at comparable ratios.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lore.kernel.org/linux-btrfs/20170412220041.GA15991@nick-pc/" class="hover:underline">2017-04-12</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2017-08-15 (v4.14-rc1)</div>
+        <div><span class="text-gray-500">SUSE:</span> SLE 15</div>
+        <div><span class="text-gray-500">RHEL:</span> -</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 0.34y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> 0.92y</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded">
+            none
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 3
+          <span class="text-gray-600"> (1.63y)</span>
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-emerald-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-emerald-400">RAID1c3 / RAID1c4</h3>
+        <span class="text-xs bg-emerald-900 text-emerald-300 px-2 py-1 rounded">btrfs</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">INCOMPAT_RAID1C34 adds 3-way and 4-way RAID1 profiles, addressing reliability needs the original RAID1 (2-copy) could not meet.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lore.kernel.org/linux-btrfs/cover.1568395858.git.dsterba@suse.com/" class="hover:underline">2019-09-13</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2019-11-18 (v5.5-rc1)</div>
+        <div><span class="text-gray-500">SUSE:</span> SLE 15 SP3</div>
+        <div><span class="text-gray-500">RHEL:</span> -</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 0.18y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> 1.59y</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded">
+            none
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 2
+          <span class="text-gray-600"> (3.58y)</span>
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-emerald-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-emerald-400">Async discard</h3>
+        <span class="text-xs bg-emerald-900 text-emerald-300 px-2 py-1 rounded">btrfs</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">Defers discard ranges to a background worker, decoupling them from extent freeing and avoiding latency spikes.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lore.kernel.org/linux-btrfs/cover.1575491930.git.dennis@kernel.org/" class="hover:underline">2019-12-04</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2020-01-20 (v5.6-rc1)</div>
+        <div><span class="text-gray-500">SUSE:</span> SLE 15 SP4</div>
+        <div><span class="text-gray-500">RHEL:</span> -</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 0.13y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> 2.42y</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded">
+            none
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 0
+          
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-emerald-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-emerald-400">Subpage block size</h3>
+        <span class="text-xs bg-emerald-900 text-emerald-300 px-2 py-1 rounded">btrfs</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">Support for sector_size &lt; PAGE_SIZE, in particular 4K btrfs blocks on 64K-page ARM systems. The pre-LBS plumbing for non-PAGE_SIZE blocks.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lore.kernel.org/linux-btrfs/20200408121006.116982-1-wqu@suse.com/" class="hover:underline">2020-04-08</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2021-02-08 (v5.12-rc1)</div>
+        <div><span class="text-gray-500">SUSE:</span> SLE 15 SP5</div>
+        <div><span class="text-gray-500">RHEL:</span> -</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 0.84y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> 2.36y</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-orange-900 text-orange-300 px-1.5 py-0.5 rounded">
+            minor
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 0
+          
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-emerald-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-emerald-400">Zoned support</h3>
+        <span class="text-xs bg-emerald-900 text-emerald-300 px-2 py-1 rounded">btrfs</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">INCOMPAT_ZONED makes btrfs aware of HM-SMR and ZNS zoned devices, with sequential write enforcement and zone-aware allocator.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lore.kernel.org/linux-btrfs/cover.1601456621.git.naohiro.aota@wdc.com/" class="hover:underline">2020-09-30</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2020-12-08 (v5.11-rc1)</div>
+        <div><span class="text-gray-500">SUSE:</span> SLE 15 SP5</div>
+        <div><span class="text-gray-500">RHEL:</span> -</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 0.19y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> 2.53y</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-orange-900 text-orange-300 px-1.5 py-0.5 rounded">
+            minor
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 0
+          
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-emerald-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-emerald-400">fs-verity</h3>
+        <span class="text-xs bg-emerald-900 text-emerald-300 px-2 py-1 rounded">btrfs</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">fs-verity support for btrfs, mirroring the ext4 work. Verity Merkle tree stored as xattrs.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lore.kernel.org/linux-btrfs/cover.1616534674.git.boris@bur.io/" class="hover:underline">2021-03-23</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2021-08-23 (v5.15-rc1)</div>
+        <div><span class="text-gray-500">SUSE:</span> -</div>
+        <div><span class="text-gray-500">RHEL:</span> -</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 0.42y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> -</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-orange-900 text-orange-300 px-1.5 py-0.5 rounded">
+            minor
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 3
+          <span class="text-gray-600"> (4.44y)</span>
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-emerald-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-emerald-400">Raid-stripe-tree</h3>
+        <span class="text-xs bg-emerald-900 text-emerald-300 px-2 py-1 rounded">btrfs</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">INCOMPAT_RAID_STRIPE_TREE adds an explicit on-disk stripe-to-physical mapping, the missing piece that lets btrfs RAID work correctly on zoned devices.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lore.kernel.org/linux-btrfs/cover.1649326374.git.johannes.thumshirn@wdc.com/" class="hover:underline">2022-04-07</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2023-10-12 (v6.7-rc1)</div>
+        <div><span class="text-gray-500">SUSE:</span> -</div>
+        <div><span class="text-gray-500">RHEL:</span> -</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 1.51y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> -</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded">
+            none
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 0
+          
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-emerald-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-emerald-400">Block group tree</h3>
+        <span class="text-xs bg-emerald-900 text-emerald-300 px-2 py-1 rounded">btrfs</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">COMPAT_RO_BLOCK_GROUP_TREE moves block group items into a dedicated tree, fixing mount-time scan cost on large filesystems.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lore.kernel.org/linux-btrfs/cover.1656516647.git.josef@toxicpanda.com/" class="hover:underline">2022-06-29</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2022-09-26 (v6.1-rc1)</div>
+        <div><span class="text-gray-500">SUSE:</span> SLE 15 SP6</div>
+        <div><span class="text-gray-500">RHEL:</span> -</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 0.24y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> 1.71y</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded">
+            none
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 1
+          <span class="text-gray-600"> (3.32y)</span>
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-emerald-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-emerald-400">Simple quotas (squotas)</h3>
+        <span class="text-xs bg-emerald-900 text-emerald-300 px-2 py-1 rounded">btrfs</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">Lightweight quota mode that drops the per-extent tracking of full qgroups in exchange for cheap shared-vs-owned accounting suited to container workloads.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lore.kernel.org/linux-btrfs/cover.1693582420.git.boris@bur.io/" class="hover:underline">2023-09-01</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2023-10-12 (v6.7-rc1)</div>
+        <div><span class="text-gray-500">SUSE:</span> -</div>
+        <div><span class="text-gray-500">RHEL:</span> -</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 0.11y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> -</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded">
+            none
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 2
+          <span class="text-gray-600"> (1.2y)</span>
+        </div>
+      </div>
+    </div>
+    
+
+    <div class="card rounded-lg p-5 border-l-4 border-emerald-500">
+      <div class="flex items-start justify-between mb-2">
+        <h3 class="font-semibold text-emerald-400">Large Block Sizes (LBS)<span class="ml-2 px-2 py-0.5 text-xs rounded bg-yellow-900 text-yellow-300">LBS</span></h3>
+        <span class="text-xs bg-emerald-900 text-emerald-300 px-2 py-1 rounded">btrfs</span>
+      </div>
+      <p class="text-gray-400 text-sm mb-3">Block sizes larger than PAGE_SIZE on btrfs. Followed XFS and rode the same mm/iomap large-folio runway; btrfs further had to extend its pre-existing subpage machinery to symmetric bs &gt; ps territory.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+        <div><span class="text-gray-500">RFC:</span> <a href="https://lore.kernel.org/linux-btrfs/cover.1732744079.git.wqu@suse.com/" class="hover:underline">2024-11-27</a></div>
+        <div><span class="text-gray-500">Merged:</span> 2025-09-23 (v6.18-rc1)</div>
+        <div><span class="text-gray-500">SUSE:</span> -</div>
+        <div><span class="text-gray-500">RHEL:</span> -</div>
+        <div><span class="text-gray-500">RFC->merge:</span> 0.82y</div>
+        <div><span class="text-gray-500">Merge->ent:</span> -</div>
+        <div>
+          <span class="text-gray-500">mm:</span>
+          <span class="bg-rose-900 text-rose-300 px-1.5 py-0.5 rounded">
+            major
+          </span>
+        </div>
+        <div>
+          <span class="text-gray-500">Fixes:</span> 1
+          <span class="text-gray-600"> (0.02y)</span>
+        </div>
+      </div>
+    </div>
+    
+          </div>
+        </section>
+        
+
+    <section class="mb-14" id="method">
+      <div class="camp-header">
+        <h2 class="text-2xl font-bold">Method</h2>
+      </div>
+      <div class="card rounded-xl p-6 text-sm text-gray-300 space-y-3">
+        <p>
+          Each feature is represented as a JSON record under
+          <code class="text-cyan-300">data/features_&lt;fs&gt;.json</code> with
+          a seed commit SHA (the commit that landed the feature flag or
+          enabling code), an RFC date pointing at lore.kernel.org or the LWN
+          announcement, hand-curated LSFMM exposure and distro enablement, an
+          MM-impact classification (none / minor / major), and free-text notes.
+        </p>
+        <p>
+          The pipeline (<code class="text-cyan-300">scripts/enrich.py</code>)
+          uses <code>git describe --contains --match v*</code> against a local
+          kernel tree to derive the kernel release that contains the seed
+          commit, and counts subsequent commits whose message bodies contain
+          <code>Fixes: &lt;short-sha&gt;</code> as a proxy for post-merge
+          fragility. <code>scripts/analyze.py</code> joins everything, computes
+          derived per-feature metrics and aggregate statistics, and emits CSV,
+          JSON, Markdown, and PNG outputs. The HTML report is just a renderer
+          on top of the same JSON.
+        </p>
+        <p>
+          MM-impact is the qualitative classification the project most cares
+          about. "none" covers pure-fs changes. "minor" covers iomap or
+          page-cache hooks that did not require generic mm work. "major"
+          covers DAX and LBS: the two features that drove year-scale mm
+          refactors.
+        </p>
+        <p>
+          The catalog is incomplete by design: minor cleanups and bug-fix
+          features are out of scope, only landings that introduced a new
+          format-level or interface-level capability are tracked. To add a
+          missed feature, append a record to the appropriate JSON file and
+          re-run <code>make</code>.
+        </p>
+      </div>
+    </section>
+
+    <footer class="text-center text-gray-600 text-sm border-t border-gray-800 pt-8">
+      <p class="mb-2">
+        <a href="https://github.com/mcgrof/fs-features" class="hover:text-gray-400">source</a>
+        <span class="mx-2">&middot;</span>
+        <a href="../PROMPTS.md" class="hover:text-gray-400">PROMPTS.md</a>
+        <span class="mx-2">&middot;</span>
+        <a href="../reports/analysis.md" class="hover:text-gray-400">analysis.md</a>
+      </p>
+      <p>MIT License &middot; Luis Chamberlain and contributors</p>
+    </footer>
+  </div>
+</body>
+</html>

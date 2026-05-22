@@ -105,24 +105,28 @@ def fixes_referencing(
 
 
 def fixes_referencing_many(
-    tree: Path, shas: list[str]
+    tree: Path,
+    shas: list[str],
+    since: str | None = None,
 ) -> tuple[int, str | None]:
     """Aggregate fixes count across a list of seed shas (for features that
-    landed across multiple commits). De-duplicates by hits' own SHA."""
+    landed across multiple commits). De-duplicates by hits' own SHA. Scans
+    only the current HEAD by default; pass a since date to narrow further.
+    """
     seen: dict[str, str] = {}
     for seed in shas:
         if not seed or len(seed) < 12:
             continue
         short = seed[:12]
-        out = git(
-            tree,
+        args = [
             "log",
-            "--all",
             f"--grep=Fixes: {short}",
             "-F",
             "--format=%H %cI",
-            allow_fail=True,
-        )
+        ]
+        if since:
+            args.append(f"--since={since}")
+        out = git(tree, *args, allow_fail=True)
         for line in out.splitlines():
             parts = line.strip().split(" ", 1)
             if len(parts) != 2:
@@ -157,10 +161,14 @@ def enrich(tree: Path, feature: dict) -> dict:
                 feature["merged_version"] = v
 
     if seeds:
-        n, last = fixes_referencing_many(tree, seeds)
+        # Narrow the Fixes-tag scan to the merge date when known. This is the
+        # main speed lever: the kernel tree has many years of history before
+        # most features, and a Fixes: tag that predates the seed sha cannot
+        # actually be referencing it.
+        merged_date = feature.get("merged_date")
+        n, last = fixes_referencing_many(tree, seeds, since=merged_date)
         feature["fixes_count"] = n
         feature["fixes_last_date"] = last
-        merged_date = feature.get("merged_date")
         if last and merged_date:
             from datetime import date
 
