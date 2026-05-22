@@ -34,7 +34,7 @@ Detailed explanation of what was changed and why. Include technical
 context concisely as prose, not as bullet lists.
 
 Generated-by: Claude AI
-Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+Signed-off-by: Luis Chamberlain <mcgrof@do-not-panic.com>
 ```
 
 Subject line and body wrap at 70 characters. No exceptions, regardless of
@@ -42,7 +42,7 @@ commit size.
 
 Never use `Co-Authored-By:` or `Generated with Claude Code` trailers. The
 exact required trailers are `Generated-by: Claude AI` and
-`Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>`.
+`Signed-off-by: Luis Chamberlain <mcgrof@do-not-panic.com>`.
 
 Write commit messages as terse prose. No shopping-list bullets unless a
 genuine enumeration aids clarity. Explain the why, not just the what.
