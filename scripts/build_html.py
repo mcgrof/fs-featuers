@@ -13,12 +13,32 @@ from __future__ import annotations
 import argparse
 import html
 import json
+import shutil
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
 DOCS = ROOT / "docs"
+REPORTS = ROOT / "reports"
+
+
+def mirror_artifacts(docs_dir: Path) -> None:
+    """Copy linked data/report artifacts into docs/ so the published tree
+    is self-contained when docs/ is the site root."""
+    docs_dir.mkdir(parents=True, exist_ok=True)
+    pairs = [
+        (DATA / "features_all.csv", docs_dir / "features_all.csv"),
+        (DATA / "analysis.json", docs_dir / "analysis.json"),
+        (DATA / "features_xfs.json", docs_dir / "features_xfs.json"),
+        (DATA / "features_ext4.json", docs_dir / "features_ext4.json"),
+        (DATA / "features_btrfs.json", docs_dir / "features_btrfs.json"),
+        (REPORTS / "findings.md", docs_dir / "findings.md"),
+        (REPORTS / "analysis.md", docs_dir / "analysis.md"),
+    ]
+    for src, dst in pairs:
+        if src.exists():
+            shutil.copy2(src, dst)
 
 
 def load_features() -> list[dict]:
@@ -302,15 +322,15 @@ def render(features: list[dict], analysis: dict) -> str:
            class="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg font-medium">
           source
         </a>
-        <a href="../data/features_all.csv"
+        <a href="features_all.csv"
            class="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg font-medium">
           CSV
         </a>
-        <a href="../data/analysis.json"
+        <a href="analysis.json"
            class="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg font-medium">
           JSON
         </a>
-        <a href="../reports/findings.md"
+        <a href="findings.md"
            class="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg font-medium">
           findings
         </a>
@@ -488,9 +508,9 @@ def render(features: list[dict], analysis: dict) -> str:
       <p class="mb-2">
         <a href="https://github.com/mcgrof/fs-features" class="hover:text-gray-400">source</a>
         <span class="mx-2">&middot;</span>
-        <a href="../PROMPTS.md" class="hover:text-gray-400">PROMPTS.md</a>
+        <a href="findings.md" class="hover:text-gray-400">findings.md</a>
         <span class="mx-2">&middot;</span>
-        <a href="../reports/analysis.md" class="hover:text-gray-400">analysis.md</a>
+        <a href="analysis.md" class="hover:text-gray-400">analysis.md</a>
       </p>
       <p>MIT License &middot; Luis Chamberlain and contributors</p>
     </footer>
@@ -515,6 +535,7 @@ def main(argv=None):
     features = [compute_derived(f) for f in features]
     analysis = load_analysis()
     args.out.parent.mkdir(parents=True, exist_ok=True)
+    mirror_artifacts(args.out.parent)
     with open(args.out, "w") as fp:
         fp.write(render(features, analysis))
     print(f"wrote {args.out}")
