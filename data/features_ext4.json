@@ -12,8 +12,13 @@
       "rfc_source": "lwn:187321",
       "merged_sha": "0d1ee42f27d3",
       "merge_source": "kernel-tree",
-      "lsfmm_years": [2007, 2008],
-      "lsfmm_urls": ["https://lwn.net/Articles/220908/"],
+      "lsfmm_years": [
+        2007,
+        2008
+      ],
+      "lsfmm_urls": [
+        "https://lwn.net/Articles/220908/"
+      ],
       "lsfmm_source": "lwn",
       "suse_first_release": "SLE 11",
       "suse_first_date": "2009-03-24",
@@ -27,7 +32,11 @@
       "rhel_source": "manual",
       "mm_impact": "none",
       "mm_impact_notes": null,
-      "notes": "ext4 declared production-ready in v2.6.28 (December 2008)."
+      "notes": "ext4 declared production-ready in v2.6.28 (December 2008).",
+      "merged_date": "2006-10-11",
+      "merged_version": "v2.6.19-rc2",
+      "fixes_count": 0,
+      "fixes_last_date": null
     },
     {
       "name": "Multi-block allocator",
@@ -39,7 +48,10 @@
       "rfc_source": "lore",
       "merged_sha": "c9de560ded61",
       "merge_source": "kernel-tree",
-      "lsfmm_years": [2007, 2008],
+      "lsfmm_years": [
+        2007,
+        2008
+      ],
       "lsfmm_urls": [],
       "lsfmm_source": "manual",
       "suse_first_release": "SLE 11",
@@ -52,7 +64,12 @@
       "rhel_source": "manual",
       "mm_impact": "none",
       "mm_impact_notes": null,
-      "notes": "Authored by Alex Tomas / Aneesh Kumar. Merged v2.6.25."
+      "notes": "Authored by Alex Tomas / Aneesh Kumar. Merged v2.6.25.",
+      "merged_date": "2008-01-29",
+      "merged_version": "v2.6.25-rc1",
+      "fixes_count": 4,
+      "fixes_last_date": "2025-11-26",
+      "fixes_window_years": 17.83
     },
     {
       "name": "Metadata checksums",
@@ -64,7 +81,10 @@
       "rfc_source": "lore",
       "merged_sha": "9b90e5e02896",
       "merge_source": "kernel-tree",
-      "lsfmm_years": [2011, 2012],
+      "lsfmm_years": [
+        2011,
+        2012
+      ],
       "lsfmm_urls": [],
       "lsfmm_source": "manual",
       "suse_first_release": "SLE 12",
@@ -78,7 +98,11 @@
       "rhel_source": "manual",
       "mm_impact": "none",
       "mm_impact_notes": null,
-      "notes": "Authored by Darrick Wong. Merged v3.5."
+      "notes": "Authored by Darrick Wong. Merged v3.5.",
+      "merged_date": "2012-01-04",
+      "merged_version": "v3.3-rc1",
+      "fixes_count": 0,
+      "fixes_last_date": null
     },
     {
       "name": "Inline data",
@@ -90,7 +114,9 @@
       "rfc_source": "lore",
       "merged_sha": "67cf5b09a46f",
       "merge_source": "kernel-tree",
-      "lsfmm_years": [2012],
+      "lsfmm_years": [
+        2012
+      ],
       "lsfmm_urls": [],
       "lsfmm_source": "manual",
       "suse_first_release": "SLE 12",
@@ -103,7 +129,12 @@
       "rhel_source": "manual",
       "mm_impact": "none",
       "mm_impact_notes": null,
-      "notes": "Authored by Tao Ma. Merged v3.8."
+      "notes": "Authored by Tao Ma. Merged v3.8.",
+      "merged_date": "2012-12-10",
+      "merged_version": "v3.8-rc1",
+      "fixes_count": 1,
+      "fixes_last_date": "2016-12-10",
+      "fixes_window_years": 4.0
     },
     {
       "name": "DAX support",
@@ -113,9 +144,13 @@
       "rfc_date": "2014-08-26",
       "rfc_url": "https://lwn.net/Articles/610174/",
       "rfc_source": "lwn:610174",
-      "merged_sha": "923ae0ff6a0c",
+      "merged_sha": "923ae0ff9250",
       "merge_source": "kernel-tree",
-      "lsfmm_years": [2014, 2015, 2016],
+      "lsfmm_years": [
+        2014,
+        2015,
+        2016
+      ],
       "lsfmm_urls": [],
       "lsfmm_source": "manual",
       "suse_first_release": "SLE 12 SP2",
@@ -129,7 +164,11 @@
       "rhel_source": "manual",
       "mm_impact": "major",
       "mm_impact_notes": "Same mm/ refactor as XFS DAX: devmap pages, pgmap accounting.",
-      "notes": "Authored by Matthew Wilcox. Merged v4.0."
+      "notes": "Authored by Matthew Wilcox. Merged v4.0.",
+      "fixes_count": 0,
+      "fixes_last_date": null,
+      "merged_date": "2015-02-16",
+      "merged_version": "v4.0-rc1"
     },
     {
       "name": "Encryption (fscrypt)",
@@ -141,8 +180,14 @@
       "rfc_source": "lore",
       "merged_sha": "3edc18d84540",
       "merge_source": "kernel-tree",
-      "lsfmm_years": [2014, 2015, 2016],
-      "lsfmm_urls": ["https://lwn.net/Articles/639427/"],
+      "lsfmm_years": [
+        2014,
+        2015,
+        2016
+      ],
+      "lsfmm_urls": [
+        "https://lwn.net/Articles/639427/"
+      ],
       "lsfmm_source": "lwn",
       "suse_first_release": "SLE 15",
       "suse_first_date": "2018-07-16",
@@ -154,7 +199,11 @@
       "rhel_source": "manual",
       "mm_impact": "minor",
       "mm_impact_notes": "Touched the page-cache read path for transparent decryption.",
-      "notes": "Authored by Michael Halcrow and Theodore Ts'o. Merged v4.0."
+      "notes": "Authored by Michael Halcrow and Theodore Ts'o. Merged v4.0.",
+      "merged_date": "2015-01-19",
+      "merged_version": "v4.0-rc1",
+      "fixes_count": 0,
+      "fixes_last_date": null
     },
     {
       "name": "Case-folded directories",
@@ -166,7 +215,9 @@
       "rfc_source": "lore",
       "merged_sha": "c83ad55eaa91",
       "merge_source": "kernel-tree",
-      "lsfmm_years": [2018],
+      "lsfmm_years": [
+        2018
+      ],
       "lsfmm_urls": [],
       "lsfmm_source": "manual",
       "suse_first_release": "SLE 15 SP3",
@@ -179,7 +230,11 @@
       "rhel_source": "manual",
       "mm_impact": "none",
       "mm_impact_notes": null,
-      "notes": "Authored by Gabriel Krisman Bertazi. Merged v5.2."
+      "notes": "Authored by Gabriel Krisman Bertazi. Merged v5.2.",
+      "merged_date": "2019-04-25",
+      "merged_version": "v5.2-rc1",
+      "fixes_count": 0,
+      "fixes_last_date": null
     },
     {
       "name": "fs-verity",
@@ -191,8 +246,13 @@
       "rfc_source": "lore",
       "merged_sha": "c93d8f885809",
       "merge_source": "kernel-tree",
-      "lsfmm_years": [2018, 2019],
-      "lsfmm_urls": ["https://lwn.net/Articles/784958/"],
+      "lsfmm_years": [
+        2018,
+        2019
+      ],
+      "lsfmm_urls": [
+        "https://lwn.net/Articles/784958/"
+      ],
       "lsfmm_source": "lwn",
       "suse_first_release": "SLE 15 SP3",
       "suse_first_date": "2021-06-22",
@@ -204,7 +264,12 @@
       "rhel_source": "manual",
       "mm_impact": "minor",
       "mm_impact_notes": "Hooks in page-cache read path for Merkle tree verification.",
-      "notes": "Authored by Eric Biggers. Merged v5.4."
+      "notes": "Authored by Eric Biggers. Merged v5.4.",
+      "merged_date": "2019-08-12",
+      "merged_version": "v5.4-rc1",
+      "fixes_count": 2,
+      "fixes_last_date": "2022-12-08",
+      "fixes_window_years": 3.32
     },
     {
       "name": "Fast commit",
@@ -216,8 +281,13 @@
       "rfc_source": "lore",
       "merged_sha": "995a3ed67fc8",
       "merge_source": "kernel-tree",
-      "lsfmm_years": [2020, 2021],
-      "lsfmm_urls": ["https://lwn.net/Articles/828423/"],
+      "lsfmm_years": [
+        2020,
+        2021
+      ],
+      "lsfmm_urls": [
+        "https://lwn.net/Articles/828423/"
+      ],
       "lsfmm_source": "lwn",
       "suse_first_release": "SLE 15 SP6",
       "suse_first_date": "2024-06-13",
@@ -230,7 +300,12 @@
       "rhel_source": "manual",
       "mm_impact": "none",
       "mm_impact_notes": null,
-      "notes": "Authored by Harshad Shirwadkar (Facebook). Merged v5.10."
+      "notes": "Authored by Harshad Shirwadkar (Facebook). Merged v5.10.",
+      "merged_date": "2020-10-21",
+      "merged_version": "v5.10-rc1",
+      "fixes_count": 2,
+      "fixes_last_date": "2023-02-25",
+      "fixes_window_years": 2.35
     },
     {
       "name": "Orphan file",
@@ -242,7 +317,10 @@
       "rfc_source": "lore",
       "merged_sha": "02f310fcf47f",
       "merge_source": "kernel-tree",
-      "lsfmm_years": [2020, 2021],
+      "lsfmm_years": [
+        2020,
+        2021
+      ],
       "lsfmm_urls": [],
       "lsfmm_source": "manual",
       "suse_first_release": "SLE 15 SP6",
@@ -255,7 +333,12 @@
       "rhel_source": "manual",
       "mm_impact": "none",
       "mm_impact_notes": null,
-      "notes": "Authored by Jan Kara (SUSE). Merged v5.15."
+      "notes": "Authored by Jan Kara (SUSE). Merged v5.15.",
+      "merged_date": "2021-08-30",
+      "merged_version": "v5.15-rc1",
+      "fixes_count": 3,
+      "fixes_last_date": "2025-09-26",
+      "fixes_window_years": 4.07
     },
     {
       "name": "iomap conversion (direct I/O)",
@@ -265,9 +348,13 @@
       "rfc_date": "2016-09-22",
       "rfc_url": "https://lore.kernel.org/linux-ext4/20160922070856.31094-1-jaegeuk@kernel.org/",
       "rfc_source": "lore",
-      "merged_sha": "364443cbcfb1",
+      "merged_sha": "378f32bab371",
       "merge_source": "kernel-tree",
-      "lsfmm_years": [2018, 2019, 2020],
+      "lsfmm_years": [
+        2018,
+        2019,
+        2020
+      ],
       "lsfmm_urls": [],
       "lsfmm_source": "manual",
       "suse_first_release": "SLE 15 SP4",
@@ -280,7 +367,12 @@
       "rhel_source": "manual",
       "mm_impact": "minor",
       "mm_impact_notes": "Page-cache awareness of iomap on direct I/O path.",
-      "notes": "ext4 buffered I/O remained on buffer_head until very recently. Merged v4.10."
+      "notes": "ext4 buffered I/O remained on buffer_head until very recently. Merged v4.10.",
+      "fixes_count": 4,
+      "fixes_last_date": "2023-10-31",
+      "merged_date": "2019-11-05",
+      "merged_version": "v5.5-rc1",
+      "fixes_window_years": 3.99
     },
     {
       "name": "Multi-fsblock atomic writes",
@@ -292,8 +384,14 @@
       "rfc_source": "lore",
       "merged_sha": "642e0dc73c5d",
       "merge_source": "kernel-tree",
-      "lsfmm_years": [2023, 2024, 2025],
-      "lsfmm_urls": ["https://lwn.net/Articles/963749/"],
+      "lsfmm_years": [
+        2023,
+        2024,
+        2025
+      ],
+      "lsfmm_urls": [
+        "https://lwn.net/Articles/963749/"
+      ],
       "lsfmm_source": "lwn",
       "suse_first_release": null,
       "suse_first_date": null,
@@ -305,7 +403,11 @@
       "rhel_source": "manual",
       "mm_impact": "minor",
       "mm_impact_notes": "Reuses XFS/iomap atomic write infrastructure.",
-      "notes": "Authored by John Garry (Oracle). Merged v6.16."
+      "notes": "Authored by John Garry (Oracle). Merged v6.16.",
+      "merged_date": "2025-05-20",
+      "merged_version": "vfs-6.16-rc3.fixes",
+      "fixes_count": 0,
+      "fixes_last_date": null
     },
     {
       "name": "Large Block Sizes (LBS)",
@@ -334,7 +436,11 @@
       ],
       "merged_sha": "cab8cbcb923a",
       "merge_source": "kernel-tree",
-      "lsfmm_years": [2017, 2024, 2025],
+      "lsfmm_years": [
+        2017,
+        2024,
+        2025
+      ],
       "lsfmm_urls": [
         "https://lwn.net/Articles/717953/"
       ],
@@ -349,7 +455,11 @@
       "rhel_source": "manual",
       "mm_impact": "major",
       "mm_impact_notes": "Shares the mm and iomap large-folio infrastructure that LBS-on-XFS forced into existence. ext4 also picked up the iomap buffered I/O path for the LBS path.",
-      "notes": "Authored by Luis Chamberlain (kernel.org) and others. Merged v6.19. The mm cost was already paid by the XFS LBS work; ext4 inherited the runway."
+      "notes": "Authored by Luis Chamberlain (kernel.org) and others. Merged v6.19. The mm cost was already paid by the XFS LBS work; ext4 inherited the runway.",
+      "merged_date": "2025-11-28",
+      "merged_version": "v6.19-rc1",
+      "fixes_count": 0,
+      "fixes_last_date": null
     }
   ]
 }

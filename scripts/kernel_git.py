@@ -78,11 +78,15 @@ def fixes_referencing(
     if not sha or len(sha) < 12:
         return (0, None)
     short = sha[:12]
+    # Use literal string match for "Fixes: <sha>" which is the kernel
+    # convention. We accept the trailing space; if a commit body uses
+    # "Fixes:<sha>" without the space the literal match misses it, but
+    # that variant is rare enough to ignore.
     args = [
         "log",
         "--all",
-        f"--grep=Fixes:[ \\t]\\+{short}",
-        "-E",
+        f"--grep=Fixes: {short}",
+        "-F",
         "--format=%cI %H",
     ]
     if since:
@@ -114,8 +118,8 @@ def fixes_referencing_many(
             tree,
             "log",
             "--all",
-            f"--grep=Fixes:[ \\t]\\+{short}",
-            "-E",
+            f"--grep=Fixes: {short}",
+            "-F",
             "--format=%H %cI",
             allow_fail=True,
         )

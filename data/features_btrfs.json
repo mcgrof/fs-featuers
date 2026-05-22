@@ -12,7 +12,9 @@
       "rfc_source": "lore",
       "merged_sha": "a6fa6fae40ec",
       "merge_source": "kernel-tree",
-      "lsfmm_years": [2010],
+      "lsfmm_years": [
+        2010
+      ],
       "lsfmm_urls": [],
       "lsfmm_source": "manual",
       "suse_first_release": "SLE 11 SP3",
@@ -26,7 +28,11 @@
       "rhel_source": "manual",
       "mm_impact": "none",
       "mm_impact_notes": null,
-      "notes": "Authored by Li Zefan (Fujitsu). Merged v2.6.38."
+      "notes": "Authored by Li Zefan (Fujitsu). Merged v2.6.38.",
+      "merged_date": "2010-12-22",
+      "merged_version": "v2.6.38-rc1",
+      "fixes_count": 0,
+      "fixes_last_date": null
     },
     {
       "name": "Mixed block groups",
@@ -51,7 +57,11 @@
       "rhel_source": "manual",
       "mm_impact": "none",
       "mm_impact_notes": null,
-      "notes": "Merged v2.6.37."
+      "notes": "Merged v2.6.37.",
+      "merged_date": "2010-10-29",
+      "merged_version": "v2.6.37-rc1",
+      "fixes_count": 0,
+      "fixes_last_date": null
     },
     {
       "name": "Quotas / qgroups",
@@ -63,8 +73,13 @@
       "rfc_source": "lore",
       "merged_sha": "bed92eae26cc",
       "merge_source": "kernel-tree",
-      "lsfmm_years": [2011, 2012],
-      "lsfmm_urls": ["https://lwn.net/Articles/488962/"],
+      "lsfmm_years": [
+        2011,
+        2012
+      ],
+      "lsfmm_urls": [
+        "https://lwn.net/Articles/488962/"
+      ],
       "lsfmm_source": "lwn",
       "suse_first_release": "SLE 12",
       "suse_first_date": "2014-10-27",
@@ -77,7 +92,12 @@
       "rhel_source": "manual",
       "mm_impact": "none",
       "mm_impact_notes": null,
-      "notes": "Authored by Arne Jansen. Merged v3.6."
+      "notes": "Authored by Arne Jansen. Merged v3.6.",
+      "merged_date": "2012-07-12",
+      "merged_version": "v3.6-rc1",
+      "fixes_count": 2,
+      "fixes_last_date": "2023-06-19",
+      "fixes_window_years": 10.93
     },
     {
       "name": "Send / receive",
@@ -89,8 +109,13 @@
       "rfc_source": "lore",
       "merged_sha": "31db9f7c23fb",
       "merge_source": "kernel-tree",
-      "lsfmm_years": [2012, 2013],
-      "lsfmm_urls": ["https://lwn.net/Articles/506244/"],
+      "lsfmm_years": [
+        2012,
+        2013
+      ],
+      "lsfmm_urls": [
+        "https://lwn.net/Articles/506244/"
+      ],
       "lsfmm_source": "lwn",
       "suse_first_release": "SLE 12",
       "suse_first_date": "2014-10-27",
@@ -102,7 +127,12 @@
       "rhel_source": "manual",
       "mm_impact": "none",
       "mm_impact_notes": null,
-      "notes": "Authored by Alexander Block (STRATO). Merged v3.6."
+      "notes": "Authored by Alexander Block (STRATO). Merged v3.6.",
+      "merged_date": "2012-07-25",
+      "merged_version": "v3.6-rc1",
+      "fixes_count": 1,
+      "fixes_last_date": "2023-11-24",
+      "fixes_window_years": 11.33
     },
     {
       "name": "Extended iref / hardlinks",
@@ -127,7 +157,12 @@
       "rhel_source": "manual",
       "mm_impact": "none",
       "mm_impact_notes": null,
-      "notes": "Authored by Mark Fasheh (SUSE). Merged v3.7."
+      "notes": "Authored by Mark Fasheh (SUSE). Merged v3.7.",
+      "merged_date": "2012-10-09",
+      "merged_version": "v3.7-rc1",
+      "fixes_count": 2,
+      "fixes_last_date": "2025-07-22",
+      "fixes_window_years": 12.78
     },
     {
       "name": "RAID 5/6",
@@ -139,8 +174,21 @@
       "rfc_source": "lore",
       "merged_sha": "4ae10b3a133e",
       "merge_source": "kernel-tree",
-      "lsfmm_years": [2012, 2013, 2014, 2015, 2018, 2019, 2020, 2022, 2023],
-      "lsfmm_urls": ["https://lwn.net/Articles/579009/", "https://lwn.net/Articles/916258/"],
+      "lsfmm_years": [
+        2012,
+        2013,
+        2014,
+        2015,
+        2018,
+        2019,
+        2020,
+        2022,
+        2023
+      ],
+      "lsfmm_urls": [
+        "https://lwn.net/Articles/579009/",
+        "https://lwn.net/Articles/916258/"
+      ],
       "lsfmm_source": "lwn",
       "suse_first_release": null,
       "suse_first_date": null,
@@ -153,7 +201,11 @@
       "rhel_source": "manual",
       "mm_impact": "none",
       "mm_impact_notes": null,
-      "notes": "Authored by Chris Mason and David Woodhouse. Merged v3.9 but never declared stable; write-hole and parity-corruption issues persist."
+      "notes": "Authored by Chris Mason and David Woodhouse. Merged v3.9 but never declared stable; write-hole and parity-corruption issues persist.",
+      "merged_date": "2013-02-01",
+      "merged_version": "v3.9-rc1",
+      "fixes_count": 0,
+      "fixes_last_date": null
     },
     {
       "name": "No-holes",
@@ -178,7 +230,11 @@
       "rhel_source": "manual",
       "mm_impact": "none",
       "mm_impact_notes": null,
-      "notes": "Authored by Filipe Manana (SUSE). Merged v4.2."
+      "notes": "Authored by Filipe Manana (SUSE). Merged v4.2.",
+      "merged_date": "2015-07-11",
+      "merged_version": "v4.2-rc3",
+      "fixes_count": 0,
+      "fixes_last_date": null
     },
     {
       "name": "Free space tree (space_cache=v2)",
@@ -190,7 +246,10 @@
       "rfc_source": "lore",
       "merged_sha": "208acb8c72d7",
       "merge_source": "kernel-tree",
-      "lsfmm_years": [2015, 2016],
+      "lsfmm_years": [
+        2015,
+        2016
+      ],
       "lsfmm_urls": [],
       "lsfmm_source": "manual",
       "suse_first_release": "SLE 15 SP2",
@@ -203,7 +262,11 @@
       "rhel_source": "manual",
       "mm_impact": "none",
       "mm_impact_notes": null,
-      "notes": "Authored by Omar Sandoval (Facebook). Merged v4.5."
+      "notes": "Authored by Omar Sandoval (Facebook). Merged v4.5.",
+      "merged_date": "2015-12-17",
+      "merged_version": "v4.5-rc1",
+      "fixes_count": 0,
+      "fixes_last_date": null
     },
     {
       "name": "zstd compression",
@@ -215,7 +278,9 @@
       "rfc_source": "lore",
       "merged_sha": "5c1aab1dd544",
       "merge_source": "kernel-tree",
-      "lsfmm_years": [2017],
+      "lsfmm_years": [
+        2017
+      ],
       "lsfmm_urls": [],
       "lsfmm_source": "manual",
       "suse_first_release": "SLE 15",
@@ -228,7 +293,12 @@
       "rhel_source": "manual",
       "mm_impact": "none",
       "mm_impact_notes": null,
-      "notes": "Authored by Nick Terrell (Facebook). Merged v4.14."
+      "notes": "Authored by Nick Terrell (Facebook). Merged v4.14.",
+      "merged_date": "2017-08-15",
+      "merged_version": "v4.14-rc1",
+      "fixes_count": 3,
+      "fixes_last_date": "2019-04-04",
+      "fixes_window_years": 1.63
     },
     {
       "name": "RAID1c3 / RAID1c4",
@@ -253,7 +323,12 @@
       "rhel_source": "manual",
       "mm_impact": "none",
       "mm_impact_notes": null,
-      "notes": "Authored by David Sterba (SUSE). Merged v5.5."
+      "notes": "Authored by David Sterba (SUSE). Merged v5.5.",
+      "merged_date": "2019-11-18",
+      "merged_version": "v5.5-rc1",
+      "fixes_count": 2,
+      "fixes_last_date": "2023-06-19",
+      "fixes_window_years": 3.58
     },
     {
       "name": "Async discard",
@@ -265,7 +340,10 @@
       "rfc_source": "lore",
       "merged_sha": "b0643e59cfa6",
       "merge_source": "kernel-tree",
-      "lsfmm_years": [2019, 2020],
+      "lsfmm_years": [
+        2019,
+        2020
+      ],
       "lsfmm_urls": [],
       "lsfmm_source": "manual",
       "suse_first_release": "SLE 15 SP4",
@@ -278,7 +356,11 @@
       "rhel_source": "manual",
       "mm_impact": "none",
       "mm_impact_notes": null,
-      "notes": "Authored by Dennis Zhou (Facebook). Merged v5.6."
+      "notes": "Authored by Dennis Zhou (Facebook). Merged v5.6.",
+      "merged_date": "2020-01-20",
+      "merged_version": "v5.6-rc1",
+      "fixes_count": 0,
+      "fixes_last_date": null
     },
     {
       "name": "Subpage block size",
@@ -290,7 +372,11 @@
       "rfc_source": "lore",
       "merged_sha": "cac06d843f25",
       "merge_source": "kernel-tree",
-      "lsfmm_years": [2020, 2021, 2022],
+      "lsfmm_years": [
+        2020,
+        2021,
+        2022
+      ],
       "lsfmm_urls": [],
       "lsfmm_source": "manual",
       "suse_first_release": "SLE 15 SP5",
@@ -303,7 +389,11 @@
       "rhel_source": "manual",
       "mm_impact": "minor",
       "mm_impact_notes": "Required reworking how btrfs interacts with the page cache for sub-PAGE sectors, prepared the path for the LBS direction.",
-      "notes": "Authored by Qu Wenruo (SUSE). Merged v5.12."
+      "notes": "Authored by Qu Wenruo (SUSE). Merged v5.12.",
+      "merged_date": "2021-02-08",
+      "merged_version": "v5.12-rc1",
+      "fixes_count": 0,
+      "fixes_last_date": null
     },
     {
       "name": "Zoned support",
@@ -315,8 +405,14 @@
       "rfc_source": "lore",
       "merged_sha": "7b3d5a90cbb9",
       "merge_source": "kernel-tree",
-      "lsfmm_years": [2020, 2021, 2022],
-      "lsfmm_urls": ["https://lwn.net/Articles/858518/"],
+      "lsfmm_years": [
+        2020,
+        2021,
+        2022
+      ],
+      "lsfmm_urls": [
+        "https://lwn.net/Articles/858518/"
+      ],
       "lsfmm_source": "lwn",
       "suse_first_release": "SLE 15 SP5",
       "suse_first_date": "2023-06-20",
@@ -328,7 +424,11 @@
       "rhel_source": "manual",
       "mm_impact": "minor",
       "mm_impact_notes": "Touched the iomap/block layer, no broad mm changes.",
-      "notes": "Authored by Naohiro Aota (Western Digital). Merged v5.12."
+      "notes": "Authored by Naohiro Aota (Western Digital). Merged v5.12.",
+      "merged_date": "2020-12-08",
+      "merged_version": "v5.11-rc1",
+      "fixes_count": 0,
+      "fixes_last_date": null
     },
     {
       "name": "fs-verity",
@@ -340,7 +440,9 @@
       "rfc_source": "lore",
       "merged_sha": "146054090b08",
       "merge_source": "kernel-tree",
-      "lsfmm_years": [2021],
+      "lsfmm_years": [
+        2021
+      ],
       "lsfmm_urls": [],
       "lsfmm_source": "manual",
       "suse_first_release": null,
@@ -353,7 +455,12 @@
       "rhel_source": "manual",
       "mm_impact": "minor",
       "mm_impact_notes": "Same hook as ext4 verity in the page-cache read path.",
-      "notes": "Authored by Boris Burkov (Facebook). Merged v5.15."
+      "notes": "Authored by Boris Burkov (Facebook). Merged v5.15.",
+      "merged_date": "2021-08-23",
+      "merged_version": "v5.15-rc1",
+      "fixes_count": 3,
+      "fixes_last_date": "2026-01-29",
+      "fixes_window_years": 4.44
     },
     {
       "name": "Block group tree",
@@ -365,7 +472,10 @@
       "rfc_source": "lore",
       "merged_sha": "1c56ab991903",
       "merge_source": "kernel-tree",
-      "lsfmm_years": [2022, 2023],
+      "lsfmm_years": [
+        2022,
+        2023
+      ],
       "lsfmm_urls": [],
       "lsfmm_source": "manual",
       "suse_first_release": "SLE 15 SP6",
@@ -378,7 +488,12 @@
       "rhel_source": "manual",
       "mm_impact": "none",
       "mm_impact_notes": null,
-      "notes": "Authored by Josef Bacik (Facebook). Merged v6.1."
+      "notes": "Authored by Josef Bacik (Facebook). Merged v6.1.",
+      "merged_date": "2022-09-26",
+      "merged_version": "v6.1-rc1",
+      "fixes_count": 1,
+      "fixes_last_date": "2026-01-20",
+      "fixes_window_years": 3.32
     },
     {
       "name": "Raid-stripe-tree",
@@ -390,7 +505,10 @@
       "rfc_source": "lore",
       "merged_sha": "ee1293308e01",
       "merge_source": "kernel-tree",
-      "lsfmm_years": [2022, 2023],
+      "lsfmm_years": [
+        2022,
+        2023
+      ],
       "lsfmm_urls": [],
       "lsfmm_source": "manual",
       "suse_first_release": null,
@@ -403,7 +521,11 @@
       "rhel_source": "manual",
       "mm_impact": "none",
       "mm_impact_notes": null,
-      "notes": "Authored by Johannes Thumshirn (WDC). Merged v6.7."
+      "notes": "Authored by Johannes Thumshirn (WDC). Merged v6.7.",
+      "merged_date": "2023-10-12",
+      "merged_version": "v6.7-rc1",
+      "fixes_count": 0,
+      "fixes_last_date": null
     },
     {
       "name": "Simple quotas (squotas)",
@@ -415,7 +537,10 @@
       "rfc_source": "lore",
       "merged_sha": "182940f4f4db",
       "merge_source": "kernel-tree",
-      "lsfmm_years": [2023, 2024],
+      "lsfmm_years": [
+        2023,
+        2024
+      ],
       "lsfmm_urls": [],
       "lsfmm_source": "manual",
       "suse_first_release": null,
@@ -428,7 +553,12 @@
       "rhel_source": "manual",
       "mm_impact": "none",
       "mm_impact_notes": null,
-      "notes": "Authored by Boris Burkov (Meta). Merged v6.7."
+      "notes": "Authored by Boris Burkov (Meta). Merged v6.7.",
+      "merged_date": "2023-10-12",
+      "merged_version": "v6.7-rc1",
+      "fixes_count": 2,
+      "fixes_last_date": "2024-12-23",
+      "fixes_window_years": 1.2
     },
     {
       "name": "Large Block Sizes (LBS)",
@@ -457,7 +587,10 @@
       ],
       "merged_sha": "98077f7f2180",
       "merge_source": "kernel-tree",
-      "lsfmm_years": [2024, 2025],
+      "lsfmm_years": [
+        2024,
+        2025
+      ],
       "lsfmm_urls": [],
       "lsfmm_source": "manual",
       "suse_first_release": null,
@@ -470,7 +603,12 @@
       "rhel_source": "manual",
       "mm_impact": "major",
       "mm_impact_notes": "Inherits the LBS mm/iomap infrastructure already created for XFS LBS. The btrfs-specific cost was extending the subpage machinery to symmetric bs > ps and ensuring read-modify-write across block boundaries.",
-      "notes": "Authored by Qu Wenruo (SUSE) and others. Merged experimental in v6.18 (Sep 2025)."
+      "notes": "Authored by Qu Wenruo (SUSE) and others. Merged experimental in v6.18 (Sep 2025).",
+      "merged_date": "2025-09-23",
+      "merged_version": "v6.18-rc1",
+      "fixes_count": 1,
+      "fixes_last_date": "2025-10-01",
+      "fixes_window_years": 0.02
     }
   ]
 }
