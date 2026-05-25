@@ -21,6 +21,40 @@ ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
 DOCS = ROOT / "docs"
 REPORTS = ROOT / "reports"
+CASE_STUDIES = ROOT / "case_studies"
+
+
+def load_case_studies() -> list[dict]:
+    """Read YAML frontmatter from every case_studies/*.md so the main
+    report can cross-link to the per-feature case studies."""
+    sys.path.insert(0, str(ROOT / "scripts"))
+    try:
+        from render_case_study import parse_case_study
+    except ImportError:
+        return []
+    metas = []
+    for src in sorted(CASE_STUDIES.glob("*.md")):
+        try:
+            meta, _ = parse_case_study(src)
+        except Exception:
+            continue
+        meta.setdefault("slug", src.stem)
+        metas.append(meta)
+    return metas
+
+
+def case_study_for_feature(
+    feat: dict, case_studies: list[dict]
+) -> dict | None:
+    """Return the case study whose slug appears as a suffix of the
+    feature's short_name. For LBS, this maps xfs_lbs/ext4_lbs/btrfs_lbs
+    all to case_studies/lbs.md (slug='lbs')."""
+    short = feat.get("short_name", "")
+    for cs in case_studies:
+        slug = cs.get("slug", "")
+        if slug and (short.endswith(f"_{slug}") or short == slug):
+            return cs
+    return None
 
 
 def mirror_artifacts(docs_dir: Path) -> None:
@@ -89,7 +123,8 @@ def fmt_num(x: object) -> str:
     return f"{x}y"
 
 
-def feature_card(feat: dict) -> str:
+def feature_card(feat: dict, case_studies: list[dict] | None = None) -> str:
+    case_studies = case_studies or []
     fs = feat["fs"]
     name = safe(feat.get("name") or feat["short_name"])
     desc = safe(feat.get("description", ""))
@@ -115,10 +150,19 @@ def feature_card(feat: dict) -> str:
         if feat["short_name"].endswith("_lbs")
         else ""
     )
+    cs = case_study_for_feature(feat, case_studies)
+    case_study_link = (
+        f'<a href="case_studies/{cs["slug"]}.html" '
+        f'class="ml-2 px-2 py-0.5 text-xs rounded bg-cyan-900 '
+        f'text-cyan-300 hover:bg-cyan-800 hover:text-cyan-100">'
+        f'case study &rarr;</a>'
+        if cs
+        else ""
+    )
     return f"""
     <div class="card rounded-lg p-5 border-l-4 {FS_BORDER[fs]}">
       <div class="flex items-start justify-between mb-2">
-        <h3 class="font-semibold {FS_HEADING[fs]}">{name}{lbs_marker}</h3>
+        <h3 class="font-semibold {FS_HEADING[fs]}">{name}{lbs_marker}{case_study_link}</h3>
         <span class="text-xs {FS_BADGE[fs]} px-2 py-1 rounded">{fs}</span>
       </div>
       <p class="text-gray-400 text-sm mb-3">{desc}</p>
@@ -160,6 +204,8 @@ def stat_row(label: str, summary: dict) -> str:
 
 
 def render(features: list[dict], analysis: dict) -> str:
+    case_studies = load_case_studies()
+
     by_fs = {}
     for f in features:
         by_fs.setdefault(f["fs"], []).append(f)
@@ -173,7 +219,7 @@ def render(features: list[dict], analysis: dict) -> str:
             continue
         # Sort by RFC date
         feats.sort(key=lambda f: f.get("rfc_date") or "9999")
-        cards = "\n".join(feature_card(f) for f in feats)
+        cards = "\n".join(feature_card(f, case_studies) for f in feats)
         fs_pretty = {"xfs": "XFS", "ext4": "ext4", "btrfs": "btrfs"}[fs]
         fs_sections.append(
             f"""
@@ -334,6 +380,10 @@ def render(features: list[dict], analysis: dict) -> str:
            class="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg font-medium">
           findings
         </a>
+        <a href="case_studies/index.html"
+           class="px-4 py-2 bg-cyan-900 hover:bg-cyan-800 text-cyan-200 rounded-lg font-medium">
+          case studies
+        </a>
       </div>
     </header>
 
@@ -426,6 +476,64 @@ def render(features: list[dict], analysis: dict) -> str:
 
       <div class="figure mt-6">
         <img src="images/lbs_per_fs.png" alt="LBS adoption per fs">
+      </div>
+
+      <div class="mt-6 card rounded-xl p-6 border-l-4 border-cyan-500">
+        <div class="flex items-start justify-between">
+          <div>
+            <h3 class="font-semibold text-lg mb-2 text-cyan-300">
+              Full LBS case study
+            </h3>
+            <p class="text-gray-300 text-sm">
+              A long-form biography of LBS in three phases: Lameter 2007 ->
+              Piggin fsblock -> Chinner 2014/2018 -> Raghav 2023, then the
+              v6.15 block-device cache work that unlocked ext4, then ext4
+              and btrfs in 2025. Every commit, every stalled attempt, every
+              reference.
+            </p>
+          </div>
+          <a href="case_studies/lbs.html"
+             class="ml-4 px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg font-medium text-sm whitespace-nowrap">
+            read &rarr;
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="mb-14" id="case-studies">
+      <div class="camp-header">
+        <h2 class="text-2xl font-bold">Case studies</h2>
+        <p class="text-gray-500 text-sm mt-1">
+          Per-feature long-form biographies written by the people who lived
+          through the work. Read the
+          <a href="case_studies/index.html" class="text-cyan-400 hover:underline">index</a>
+          or pitch a new one.
+        </p>
+      </div>
+      <div class="card rounded-xl p-6">
+        <p class="text-gray-300 text-sm mb-3">
+          If you maintained, designed, or stabilized a major Linux
+          filesystem feature, please consider contributing a case study.
+          The catalog row gives the numbers; only the people who were on
+          the threads can give the context. We are especially looking for
+          biographies of features that touched core mm: DAX, large
+          folios, idmapped mounts, the buffer-head retirement effort, and
+          the next round of MM-impact filesystem work.
+        </p>
+        <div class="flex flex-wrap gap-3 text-sm">
+          <a href="case_studies/index.html"
+             class="px-4 py-2 bg-cyan-900 hover:bg-cyan-800 text-cyan-200 rounded-lg font-medium">
+            browse case studies
+          </a>
+          <a href="https://github.com/mcgrof/fs-features/blob/master/CONTRIBUTING.md"
+             class="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg font-medium">
+            how to contribute
+          </a>
+          <a href="case_studies/lbs.md"
+             class="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg font-medium">
+            template (lbs.md)
+          </a>
+        </div>
       </div>
     </section>
 

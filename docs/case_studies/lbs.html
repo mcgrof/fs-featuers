@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Large Block Sizes -- fs-features case study</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { background: #0f172a; }
+    .card {
+      background: linear-gradient(145deg, #1e293b, #1a2332);
+      border: 1px solid #334155;
+    }
+    a code { color: inherit; }
+  </style>
+</head>
+<body class="min-h-screen text-gray-100">
+  <div class="max-w-4xl mx-auto px-6 py-12">
+
+    <nav class="mb-8 flex items-center justify-between text-sm">
+      <div class="flex gap-4">
+        <a href="../index.html" class="text-gray-400 hover:text-gray-200">
+          &larr; fs-features
+        </a>
+        <a href="index.html" class="text-gray-400 hover:text-gray-200">
+          case studies index
+        </a>
+      </div>
+      <div class="flex gap-3">
+        <a href="lbs.md"
+           class="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 rounded font-medium">
+          .md source
+        </a>
+        <a href="https://github.com/mcgrof/fs-features/edit/master/case_studies/lbs.md"
+           class="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 rounded font-medium">
+          edit on GitHub
+        </a>
+      </div>
+    </nav>
+
+    <article class="card rounded-xl p-8 md:p-12">
+      
+    <header class="mb-10 pb-8 border-b border-gray-700">
+      <p class="text-xs uppercase tracking-wide text-cyan-400 mb-2">
+        Case study
+      </p>
+      <h1 class="text-4xl font-bold text-gray-100 mb-2">Large Block Sizes</h1>
+      <p class="text-lg text-gray-400">From Lameter 2007 to LBS-everywhere 2026 — anatomy of an eighteen-year arc</p>
+      <div class="mt-6 flex flex-wrap gap-2">
+            <span class="inline-flex items-center gap-1 bg-cyan-900 text-cyan-300 px-2 py-1 rounded text-xs"><span class="text-gray-500">fs</span><span class="font-semibold">xfs</span></span>
+            <span class="inline-flex items-center gap-1 bg-purple-900 text-purple-300 px-2 py-1 rounded text-xs"><span class="text-gray-500">fs</span><span class="font-semibold">ext4</span></span>
+            <span class="inline-flex items-center gap-1 bg-emerald-900 text-emerald-300 px-2 py-1 rounded text-xs"><span class="text-gray-500">fs</span><span class="font-semibold">btrfs</span></span>
+            <span class="inline-flex items-center gap-1 bg-rose-900 text-rose-300 px-2 py-1 rounded text-xs"><span class="text-gray-500">mm-impact</span><span class="font-semibold">major</span></span>
+            <span class="inline-flex items-center gap-1 bg-emerald-900 text-emerald-300 px-2 py-1 rounded text-xs"><span class="text-gray-500">status</span><span class="font-semibold">shipping</span></span>
+            <span class="inline-flex items-center gap-1 bg-gray-800 text-gray-300 px-2 py-1 rounded text-xs"><span class="text-gray-500">first idea</span><span class="font-semibold">2007-05-15</span></span>
+            <span class="inline-flex items-center gap-1 bg-gray-800 text-gray-300 px-2 py-1 rounded text-xs"><span class="text-gray-500">merged</span><span class="font-semibold">2024-09-03 (v6.12)</span></span>
+            <span class="inline-flex items-center gap-1 bg-gray-800 text-gray-300 px-2 py-1 rounded text-xs"><span class="text-gray-500">updated</span><span class="font-semibold">2026-05-25</span></span>
+      </div>
+      <div class="mt-3 text-sm text-gray-400"><span class="text-gray-500">maintainers:</span> <span class="text-gray-300">Pankaj Raghav, Luis Chamberlain, Hannes Reinecke</span></div>
+      
+        <div class="mt-6">
+          <div class="text-xs uppercase tracking-wide text-gray-500 mb-2">
+            authors / contributors
+          </div>
+          <ul class="list-disc ml-6 space-y-1">
+              <li class="text-sm text-gray-400">Christoph Lameter (original compound-page proposal, 2007)</li>
+              <li class="text-sm text-gray-400">Nick Piggin (fsblock attempt, 2007–2009)</li>
+              <li class="text-sm text-gray-400">Dave Chinner (multi-year design guidance, 2014/2018/2023)</li>
+              <li class="text-sm text-gray-400">Pankaj Raghav (XFS LBS series that landed, 2023–2024)</li>
+              <li class="text-sm text-gray-400">Luis Chamberlain (block layer LBS, buffer-head bdev cache, large sector sizes)</li>
+              <li class="text-sm text-gray-400">Hannes Reinecke (block layer collaborator)</li>
+              <li class="text-sm text-gray-400">Matthew Wilcox (folio infrastructure)</li>
+              <li class="text-sm text-gray-400">Darrick Wong (XFS reviewer / co-author)</li>
+              <li class="text-sm text-gray-400">Qu Wenruo (btrfs LBS series)</li>
+          </ul>
+        </div>
+        
+    </header>
+    
+<h1 id="large-block-sizes-lbs" class="text-4xl font-bold mb-2 text-gray-100">Large Block Sizes (LBS)</h1>
+<h2 id="what-and-why" class="text-2xl font-bold mt-12 mb-4 pb-2 border-b border-gray-700 text-gray-100">What and why</h2>
+<p class="text-gray-300 leading-relaxed mb-4">LBS lets a filesystem use a logical block size larger than the system's
+<code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">PAGE_SIZE</code>. Storage hardware has been quietly shipping 16 KiB indirection
+units for years, databases speak in 16 KiB / 32 KiB pages, and the bigger
+the filesystem block the smaller the metadata overhead. The Linux page
+cache, however, was wired to <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">PAGE_SIZE</code> everywhere — and that single
+assumption is what made LBS a seventeen-year story instead of a one-cycle
+patch series.</p>
+<p class="text-gray-300 leading-relaxed mb-4">This case study is the worked example of how core filesystem features
+actually mature in Linux. It catalogs every serious attempt, the
+mailing-list and LSFMM discussions that pulled the design back into the
+ditch and out of it again, and the eventual landing across XFS, the
+block-device cache, ext4, and btrfs.</p>
+<h2 id="timeline-of-attempts" class="text-2xl font-bold mt-12 mb-4 pb-2 border-b border-gray-700 text-gray-100">Timeline of attempts</h2>
+<table class="w-full text-sm border-collapse mb-6">
+<thead class="border-b border-gray-700 text-gray-400">
+<tr class="border-b border-gray-800">
+<th class="text-left py-2 px-3 font-medium">Year</th>
+<th class="text-left py-2 px-3 font-medium">Author</th>
+<th class="text-left py-2 px-3 font-medium">Posting / venue</th>
+<th class="text-left py-2 px-3 font-medium">Outcome</th>
+</tr>
+</thead>
+<tbody>
+<tr class="border-b border-gray-800">
+<td class="py-2 px-3 text-gray-300 align-top">2007-05</td>
+<td class="py-2 px-3 text-gray-300 align-top">Christoph Lameter</td>
+<td class="py-2 px-3 text-gray-300 align-top"><a href="https://lwn.net/Articles/232757/" class="text-cyan-400 hover:text-cyan-200 hover:underline">Variable Order Page Cache</a> — compound pages in the page cache</td>
+<td class="py-2 px-3 text-gray-300 align-top">Stalled</td>
+</tr>
+<tr class="border-b border-gray-800">
+<td class="py-2 px-3 text-gray-300 align-top">2007-07</td>
+<td class="py-2 px-3 text-gray-300 align-top">Nick Piggin</td>
+<td class="py-2 px-3 text-gray-300 align-top"><a href="https://lwn.net/Articles/239621/" class="text-cyan-400 hover:text-cyan-200 hover:underline">fsblock</a> — replace <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">buffer_head</code> to support larger blocks</td>
+<td class="py-2 px-3 text-gray-300 align-top">Stalled</td>
+</tr>
+<tr class="border-b border-gray-800">
+<td class="py-2 px-3 text-gray-300 align-top">2009-03</td>
+<td class="py-2 px-3 text-gray-300 align-top">Nick Piggin</td>
+<td class="py-2 px-3 text-gray-300 align-top"><a href="https://lwn.net/Articles/321390/" class="text-cyan-400 hover:text-cyan-200 hover:underline">Updated fsblock patches</a></td>
+<td class="py-2 px-3 text-gray-300 align-top">Did not land</td>
+</tr>
+<tr class="border-b border-gray-800">
+<td class="py-2 px-3 text-gray-300 align-top">2014-01</td>
+<td class="py-2 px-3 text-gray-300 align-top">Dave Chinner</td>
+<td class="py-2 px-3 text-gray-300 align-top"><a href="https://lore.kernel.org/linux-mm/20140123082121.GN13997@dastard/" class="text-cyan-400 hover:text-cyan-200 hover:underline">Why prior LBS efforts failed and what to try instead</a></td>
+<td class="py-2 px-3 text-gray-300 align-top">Design analysis</td>
+</tr>
+<tr class="border-b border-gray-800">
+<td class="py-2 px-3 text-gray-300 align-top">2017-03</td>
+<td class="py-2 px-3 text-gray-300 align-top">LSFMM 2017</td>
+<td class="py-2 px-3 text-gray-300 align-top"><a href="https://lwn.net/Articles/717953/" class="text-cyan-400 hover:text-cyan-200 hover:underline">Page-cache larger than PAGE_SIZE</a> — group discussion</td>
+<td class="py-2 px-3 text-gray-300 align-top">Inconclusive</td>
+</tr>
+<tr class="border-b border-gray-800">
+<td class="py-2 px-3 text-gray-300 align-top">2018-11</td>
+<td class="py-2 px-3 text-gray-300 align-top">Dave Chinner</td>
+<td class="py-2 px-3 text-gray-300 align-top"><a href="https://lwn.net/ml/linux-fsdevel/20181107063127.3902-1-david@fromorbit.com/" class="text-cyan-400 hover:text-cyan-200 hover:underline">Block size &gt; PAGE_SIZE attempt</a></td>
+<td class="py-2 px-3 text-gray-300 align-top">Stalled</td>
+</tr>
+<tr class="border-b border-gray-800">
+<td class="py-2 px-3 text-gray-300 align-top">2023-03</td>
+<td class="py-2 px-3 text-gray-300 align-top">Dave Chinner</td>
+<td class="py-2 px-3 text-gray-300 align-top"><a href="https://lore.kernel.org/all/20230308075952.GU2825702@dread.disaster.area/T/#u" class="text-cyan-400 hover:text-cyan-200 hover:underline">LBS design guidance to Pankaj Raghav</a></td>
+<td class="py-2 px-3 text-gray-300 align-top">Inflection point</td>
+</tr>
+<tr class="border-b border-gray-800">
+<td class="py-2 px-3 text-gray-300 align-top">2023-09</td>
+<td class="py-2 px-3 text-gray-300 align-top">Pankaj Raghav et al</td>
+<td class="py-2 px-3 text-gray-300 align-top"><a href="https://lore.kernel.org/all/20230915183848.1018717-1-kernel@pankajraghav.com/" class="text-cyan-400 hover:text-cyan-200 hover:underline">Enable block size &gt; page size in XFS</a></td>
+<td class="py-2 px-3 text-gray-300 align-top">Landed</td>
+</tr>
+<tr class="border-b border-gray-800">
+<td class="py-2 px-3 text-gray-300 align-top">2024-09</td>
+<td class="py-2 px-3 text-gray-300 align-top">Pankaj Raghav</td>
+<td class="py-2 px-3 text-gray-300 align-top"><a href="https://lore.kernel.org/linux-xfs/?q=7df7c204c678" class="text-cyan-400 hover:text-cyan-200 hover:underline">XFS LBS merged</a> — <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">7df7c204c678</code></td>
+<td class="py-2 px-3 text-gray-300 align-top">v6.12</td>
+</tr>
+<tr class="border-b border-gray-800">
+<td class="py-2 px-3 text-gray-300 align-top">2024-11</td>
+<td class="py-2 px-3 text-gray-300 align-top">Luis Chamberlain</td>
+<td class="py-2 px-3 text-gray-300 align-top"><a href="https://lore.kernel.org/all/20241113094727.1497722-1-mcgrof@kernel.org/T/#mdea8649dd7254d1237d358c53dff17b02a60bf33" class="text-cyan-400 hover:text-cyan-200 hover:underline">Large sector sizes via the bdev cache</a></td>
+<td class="py-2 px-3 text-gray-300 align-top">RFC</td>
+</tr>
+<tr class="border-b border-gray-800">
+<td class="py-2 px-3 text-gray-300 align-top">2025-02</td>
+<td class="py-2 px-3 text-gray-300 align-top">Luis Chamberlain</td>
+<td class="py-2 px-3 text-gray-300 align-top"><a href="https://lore.kernel.org/linux-fsdevel/?q=block%2Fbdev+lift+block+size+restrictions+to+64k" class="text-cyan-400 hover:text-cyan-200 hover:underline">Enable bs &gt; ps for block devices</a> — <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">47dd67532303</code> and friends</td>
+<td class="py-2 px-3 text-gray-300 align-top">v6.15</td>
+</tr>
+<tr class="border-b border-gray-800">
+<td class="py-2 px-3 text-gray-300 align-top">2025-03</td>
+<td class="py-2 px-3 text-gray-300 align-top">Luis Chamberlain</td>
+<td class="py-2 px-3 text-gray-300 align-top"><code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">FS_LBS</code> flag gate added to <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">include/linux/fs.h</code> — <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">a64e5a596067</code></td>
+<td class="py-2 px-3 text-gray-300 align-top">v6.15</td>
+</tr>
+<tr class="border-b border-gray-800">
+<td class="py-2 px-3 text-gray-300 align-top">2025-09</td>
+<td class="py-2 px-3 text-gray-300 align-top">btrfs LBS</td>
+<td class="py-2 px-3 text-gray-300 align-top"><code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">98077f7f2180</code> (Qu Wenruo) — experimental bs &gt; ps</td>
+<td class="py-2 px-3 text-gray-300 align-top">v6.18</td>
+</tr>
+<tr class="border-b border-gray-800">
+<td class="py-2 px-3 text-gray-300 align-top">2025-11</td>
+<td class="py-2 px-3 text-gray-300 align-top">ext4 LBS</td>
+<td class="py-2 px-3 text-gray-300 align-top"><code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">cab8cbcb923a</code> (Luis Chamberlain) — block sizes &gt; PAGE_SIZE on ext4</td>
+<td class="py-2 px-3 text-gray-300 align-top">v6.19</td>
+</tr>
+<tr class="border-b border-gray-800">
+<td class="py-2 px-3 text-gray-300 align-top">2026-01</td>
+<td class="py-2 px-3 text-gray-300 align-top">XFS</td>
+<td class="py-2 px-3 text-gray-300 align-top"><code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">4d6d335ea955</code> — LBS promoted from experimental together with metadirectory</td>
+<td class="py-2 px-3 text-gray-300 align-top">v7.0</td>
+</tr>
+</tbody>
+</table>
+<p class="text-gray-300 leading-relaxed mb-4">Eighteen years and three months of wall-clock between Lameter's first
+mailing-list posting and XFS LBS shipping as a non-experimental,
+default-buildable feature.</p>
+<h2 id="what-was-different-about-the-2023-attempt" class="text-2xl font-bold mt-12 mb-4 pb-2 border-b border-gray-700 text-gray-100">What was different about the 2023 attempt</h2>
+<p class="text-gray-300 leading-relaxed mb-4">The first four attempts (Lameter 2007, Piggin 2007/2009, Chinner 2018)
+all collided with the same wall: <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">struct page</code> was the page-cache unit,
+and every page-cache helper assumed a single page meant <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">PAGE_SIZE</code>
+bytes. Anything LBS-shaped had to either replace <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">buffer_head</code> (Piggin's
+direction), introduce compound pages everywhere (Lameter's direction),
+or wait for a generalized larger-than-page unit in the page cache.</p>
+<p class="text-gray-300 leading-relaxed mb-4">By 2023 the generalized unit existed. <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">struct folio</code> had landed in v5.16
+(Wilcox, 2021), multi-page folios were maturing in the page cache, and
+the XFS iomap conversion (Hellwig 2019, v5.5) had already moved XFS's
+buffered I/O path off <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">buffer_head</code>. The prerequisites for an LBS that
+<em class="italic text-gray-200">was not also a rewrite of the page cache</em> were finally in place.</p>
+<p class="text-gray-300 leading-relaxed mb-4">Dave Chinner's <a href="https://lore.kernel.org/all/20230308075952.GU2825702@dread.disaster.area/T/#u" class="text-cyan-400 hover:text-cyan-200 hover:underline">March 8 2023 message to
+Pankaj Raghav</a>
+captured the new design constraint: build on folios, don't touch
+<code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">buffer_head</code>-based filesystems yet, layer the changes (mm first, fs
+second), and lean on <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">fstests</code> + <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">kdevops</code> for the test surface that the
+prior attempts never had. That message is the inflection point. The
+Raghav series that landed in v6.12 is recognizable as the direct
+implementation of that guidance.</p>
+<p class="text-gray-300 leading-relaxed mb-4">The other piece of the story is testing. LBS exercises corners of the
+page cache, iomap, and the block layer that no normal workload reaches.
+The 2023 series was the first LBS effort whose test matrix was driven
+end-to-end by <a href="https://github.com/linux-kdevops/kdevops" class="text-cyan-400 hover:text-cyan-200 hover:underline">kdevops</a> —
+provisioning matrices of block sizes, page sizes, filesystems, and
+workloads, and triaged with AI-assisted summarization of <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">fstests</code>
+output. The prior attempts had nothing comparable; bugs that would have
+killed earlier RFCs were caught in test instead of in review.</p>
+<h2 id="how-lbs-landed-in-xfs-v612-september-2024" class="text-2xl font-bold mt-12 mb-4 pb-2 border-b border-gray-700 text-gray-100">How LBS landed in XFS (v6.12, September 2024)</h2>
+<p class="text-gray-300 leading-relaxed mb-4">The XFS LBS series merged in seven mm/iomap/fs patches:</p>
+<ul class="list-disc ml-6 space-y-1 mb-4 text-gray-300">
+<li class="leading-relaxed"><code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">ab95d23bab22</code> filemap: allocate <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">mapping_min_order</code> folios in the page cache (2024-08-23)</li>
+<li class="leading-relaxed"><code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">26cfdb395eef</code> readahead: allocate folios with <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">mapping_min_order</code> in readahead (2024-08-23)</li>
+<li class="leading-relaxed"><code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">e220917fa507</code> mm: split a folio in minimum folio order chunks (2024-09-02)</li>
+<li class="leading-relaxed"><code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">743a2753a02e</code> filemap: cap PTE range to allowed zero fill in <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">folio_map_range()</code> (2024-09-02)</li>
+<li class="leading-relaxed"><code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">10553a91652d</code> iomap: fix <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">iomap_dio_zero()</code> for fs bs &gt; system page size (2024-09-02)</li>
+<li class="leading-relaxed"><code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">79012cfa00b5</code> xfs: expose block size in stat (2024-09-02)</li>
+<li class="leading-relaxed"><code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">cebf9dacd5c3</code> xfs: make the calculation generic in <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">xfs_sb_validate_fsb_count()</code> (2024-09-02)</li>
+<li class="leading-relaxed"><code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">7df7c204c678</code> xfs: enable block size larger than page size support (2024-09-03)</li>
+</ul>
+<p class="text-gray-300 leading-relaxed mb-4">All seven landed via the <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">vfs-6.12.blocksize</code> topic branch under
+Christian Brauner. The XFS-side change is small because the heavy lifting
+is in mm and iomap — exactly the layering Chinner's 2023 message
+prescribed.</p>
+<h2 id="phase-2-the-bdev-cache-and-buffer-heads-v615-februarymarch-2025" class="text-2xl font-bold mt-12 mb-4 pb-2 border-b border-gray-700 text-gray-100">Phase 2: the bdev cache and buffer heads (v6.15, February–March 2025)</h2>
+<p class="text-gray-300 leading-relaxed mb-4">XFS LBS works because XFS is iomap-native. ext4 still drives its
+buffered I/O through <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">buffer_head</code>, and the block device cache itself
+uses <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">buffer_head</code> for the partition-table read, the superblock probe,
+and a thousand small things. Without LBS on the bdev cache, no
+<code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">buffer_head</code>-based filesystem could ever see a &gt;PAGE_SIZE block.</p>
+<p class="text-gray-300 leading-relaxed mb-4">The "Enable bs &gt; ps for block devices" series authored by Luis
+Chamberlain (with review from Hannes Reinecke, Christian Brauner,
+Christoph Hellwig, and Pankaj Raghav) closed that gap in v6.15:</p>
+<ul class="list-disc ml-6 space-y-1 mb-4 text-gray-300">
+<li class="leading-relaxed"><code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">26fff8a4432f</code> block/bdev: use helper for max block size check (2024-12-18)</li>
+<li class="leading-relaxed"><code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">753aadebf2e3</code> fs/buffer: simplify <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">block_read_full_folio()</code> with <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">bh_offset()</code> (2025-02-24)</li>
+<li class="leading-relaxed"><code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">8b45a4f4133d</code> fs/mpage: use <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">blocks_per_folio</code> instead of <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">blocks_per_page</code> (2025-02-24)</li>
+<li class="leading-relaxed"><code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">e59e97d42b05</code> fs/buffer fs/mpage: remove large folio restriction (2025-02-24)</li>
+<li class="leading-relaxed"><code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">47dd67532303</code> block/bdev: lift block size restrictions to 64k (2025-02-24)</li>
+<li class="leading-relaxed"><code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">3c20917120ce</code> block/bdev: enable large folio support for large logical block sizes (2025-02-24)</li>
+<li class="leading-relaxed"><code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">425fbcd62d2e</code> bdev: use <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">bdev_io_min()</code> for statx block size (2025-02-24)</li>
+<li class="leading-relaxed"><code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">a64e5a596067</code> bdev: add back <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">PAGE_SIZE</code> block size validation for <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">sb_set_blocksize()</code> — the <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">FS_LBS</code> gate (2025-03-07)</li>
+</ul>
+<p class="text-gray-300 leading-relaxed mb-4">The companion <a href="https://lore.kernel.org/all/20241113094727.1497722-1-mcgrof@kernel.org/T/#mdea8649dd7254d1237d358c53dff17b02a60bf33" class="text-cyan-400 hover:text-cyan-200 hover:underline">"large sector sizes" series</a>
+posted November 2024 was the design lead-in for this work: it sketched
+how the block layer could expose logical block sizes greater than
+<code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">PAGE_SIZE</code> to filesystems without burning down the bdev cache, and
+walked through the buffer_head implications.</p>
+<p class="text-gray-300 leading-relaxed mb-4">The <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">FS_LBS</code> flag in <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">include/linux/fs.h</code> is the bouncer: filesystems
+that have audited their I/O path for LBS set the flag, and
+<code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">sb_set_blocksize()</code> refuses any non-LBS filesystem from mounting at
+blocksize &gt; <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">PAGE_SIZE</code>. This is what unblocked ext4.</p>
+<h2 id="phase-3-ext4-picks-it-up-v619-november-2025" class="text-2xl font-bold mt-12 mb-4 pb-2 border-b border-gray-700 text-gray-100">Phase 3: ext4 picks it up (v6.19, November 2025)</h2>
+<p class="text-gray-300 leading-relaxed mb-4">ext4 LBS landed in <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">cab8cbcb923a</code> after the bdev-cache runway was in
+place. The ext4 series is much smaller than the XFS one — most of the
+real work had already been done in mm, iomap, the block layer, and the
+bdev cache. The ext4 RFC-to-merge was 0.34 years, the fastest of any
+ext4 feature in the catalog except <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">ext4_encrypt</code> (which only had to
+reserve codepoints to merge).</p>
+<h2 id="phase-4-btrfs-follows-v618-september-2025-experimental" class="text-2xl font-bold mt-12 mb-4 pb-2 border-b border-gray-700 text-gray-100">Phase 4: btrfs follows (v6.18, September 2025, experimental)</h2>
+<p class="text-gray-300 leading-relaxed mb-4">btrfs LBS landed as experimental in <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">98077f7f2180</code> (Qu Wenruo). btrfs
+had to extend its pre-existing subpage machinery — already used for
+4 KiB blocks on 64 KiB-page ARM systems — to symmetric bs &gt; ps territory,
+which is why the btrfs RFC-to-merge of 0.82y is longer than ext4's.</p>
+<h2 id="numbers" class="text-2xl font-bold mt-12 mb-4 pb-2 border-b border-gray-700 text-gray-100">Numbers</h2>
+<table class="w-full text-sm border-collapse mb-6">
+<thead class="border-b border-gray-700 text-gray-400">
+<tr class="border-b border-gray-800">
+<th class="text-left py-2 px-3 font-medium">metric</th>
+<th class="text-left py-2 px-3 font-medium">XFS</th>
+<th class="text-left py-2 px-3 font-medium">ext4</th>
+<th class="text-left py-2 px-3 font-medium">btrfs</th>
+</tr>
+</thead>
+<tbody>
+<tr class="border-b border-gray-800">
+<td class="py-2 px-3 text-gray-300 align-top">First-idea date</td>
+<td class="py-2 px-3 text-gray-300 align-top">2007-05-15</td>
+<td class="py-2 px-3 text-gray-300 align-top">2007-05-15</td>
+<td class="py-2 px-3 text-gray-300 align-top">2007-05-15</td>
+</tr>
+<tr class="border-b border-gray-800">
+<td class="py-2 px-3 text-gray-300 align-top">Successful-attempt RFC</td>
+<td class="py-2 px-3 text-gray-300 align-top">2023-09-15</td>
+<td class="py-2 px-3 text-gray-300 align-top">2025-07-25</td>
+<td class="py-2 px-3 text-gray-300 align-top">2024-11-27</td>
+</tr>
+<tr class="border-b border-gray-800">
+<td class="py-2 px-3 text-gray-300 align-top">Merged</td>
+<td class="py-2 px-3 text-gray-300 align-top">2024-09-03 (v6.12)</td>
+<td class="py-2 px-3 text-gray-300 align-top">2025-11-28 (v6.19)</td>
+<td class="py-2 px-3 text-gray-300 align-top">2025-09-23 (v6.18)</td>
+</tr>
+<tr class="border-b border-gray-800">
+<td class="py-2 px-3 text-gray-300 align-top">RFC → merge</td>
+<td class="py-2 px-3 text-gray-300 align-top">0.97y</td>
+<td class="py-2 px-3 text-gray-300 align-top">0.34y</td>
+<td class="py-2 px-3 text-gray-300 align-top">0.82y</td>
+</tr>
+<tr class="border-b border-gray-800">
+<td class="py-2 px-3 text-gray-300 align-top">First idea → merge</td>
+<td class="py-2 px-3 text-gray-300 align-top">17.31y</td>
+<td class="py-2 px-3 text-gray-300 align-top">18.54y</td>
+<td class="py-2 px-3 text-gray-300 align-top">18.36y</td>
+</tr>
+<tr class="border-b border-gray-800">
+<td class="py-2 px-3 text-gray-300 align-top">Lag after XFS LBS</td>
+<td class="py-2 px-3 text-gray-300 align-top">—</td>
+<td class="py-2 px-3 text-gray-300 align-top">1.23y</td>
+<td class="py-2 px-3 text-gray-300 align-top">1.05y</td>
+</tr>
+<tr class="border-b border-gray-800">
+<td class="py-2 px-3 text-gray-300 align-top">Enterprise first</td>
+<td class="py-2 px-3 text-gray-300 align-top">RHEL 10.0 (2025-05-20)</td>
+<td class="py-2 px-3 text-gray-300 align-top">not yet</td>
+<td class="py-2 px-3 text-gray-300 align-top">not yet</td>
+</tr>
+<tr class="border-b border-gray-800">
+<td class="py-2 px-3 text-gray-300 align-top">Merge → enterprise</td>
+<td class="py-2 px-3 text-gray-300 align-top">0.71y</td>
+<td class="py-2 px-3 text-gray-300 align-top">—</td>
+<td class="py-2 px-3 text-gray-300 align-top">—</td>
+</tr>
+</tbody>
+</table>
+<p class="text-gray-300 leading-relaxed mb-4"><code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">merge → enterprise</code> for XFS LBS at 0.71 years is the fastest of any
+feature in the catalog. RHEL 10 picked it up the next merge window. The
+broader pattern: the fs-level RFC pace looks ordinary on each LBS
+landing, but the first-idea-to-merge wall-clock is the longest of any
+feature tracked, and the enterprise adoption pace is the fastest. The
+two extremes are the same story told from different ends.</p>
+<h2 id="what-this-case-study-suggests-about-how-linux-fs-features-mature" class="text-2xl font-bold mt-12 mb-4 pb-2 border-b border-gray-700 text-gray-100">What this case study suggests about how Linux fs features mature</h2>
+<p class="text-gray-300 leading-relaxed mb-4">Three patterns repeat across LBS that are worth watching for the next
+case study:</p>
+<ol class="list-decimal ml-6 space-y-1 mb-4 text-gray-300">
+<li class="leading-relaxed">
+<p class="text-gray-300 leading-relaxed mb-4"><strong class="font-semibold text-gray-100">The hard problem is rarely in the filesystem.</strong> XFS LBS is six
+   small XFS patches sitting on top of years of mm, iomap, folio, and
+   block-layer work. The per-feature RFC measures only the visible
+   tip; the iceberg is the dependency chain.</p>
+</li>
+<li class="leading-relaxed">
+<p class="text-gray-300 leading-relaxed mb-4"><strong class="font-semibold text-gray-100">Stalled prior attempts are signal, not failure.</strong> Lameter 2007,
+   Piggin 2007/2009, and Chinner 2018 each named what was wrong and
+   built shared vocabulary. The 2023 attempt did not start from
+   scratch — it inherited a decade and a half of vocabulary about what
+   "doing LBS right" had to look like.</p>
+</li>
+<li class="leading-relaxed">
+<p class="text-gray-300 leading-relaxed mb-4"><strong class="font-semibold text-gray-100">Testing surface matters more than reviewer count.</strong> What changed
+   in 2023 was less the design and more the test matrix that exercised
+   it. The kdevops + AI-triage pipeline made it possible to catch
+   bs/ps/workload combinations that broke the page cache in corners
+   nobody would think to look at by eye. Without that, the 2023 RFC
+   would have been "Chinner 2018 redux."</p>
+</li>
+</ol>
+<h2 id="references-and-further-reading" class="text-2xl font-bold mt-12 mb-4 pb-2 border-b border-gray-700 text-gray-100">References and further reading</h2>
+<ul class="list-disc ml-6 space-y-1 mb-4 text-gray-300">
+<li class="leading-relaxed"><a href="https://kernelnewbies.org/KernelProjects/large-block-size" class="text-cyan-400 hover:text-cyan-200 hover:underline">kernelnewbies LBS project page</a> — canonical chronology, kept up to date by the project.</li>
+<li class="leading-relaxed"><a href="https://lwn.net/Articles/610174/" class="text-cyan-400 hover:text-cyan-200 hover:underline">LWN: A larger-than-page page cache</a> — DAX-era LWN coverage of the folio direction that ultimately enabled LBS.</li>
+<li class="leading-relaxed"><a href="https://lwn.net/Articles/717953/" class="text-cyan-400 hover:text-cyan-200 hover:underline">LWN: LSFMM 2017 page-cache &gt; PAGE_SIZE</a> — the discussion that revived the topic.</li>
+<li class="leading-relaxed"><a href="https://lwn.net/Articles/932900/" class="text-cyan-400 hover:text-cyan-200 hover:underline">LWN: LSFMM 2023 block-size &gt; page-size session</a> — coverage of the run-up to the 2023 RFC.</li>
+<li class="leading-relaxed"><a href="https://lore.kernel.org/all/20230915183848.1018717-1-kernel@pankajraghav.com/" class="text-cyan-400 hover:text-cyan-200 hover:underline">Pankaj Raghav's XFS LBS announcement</a> — the RFC that landed.</li>
+<li class="leading-relaxed"><a href="https://lore.kernel.org/all/20230308075952.GU2825702@dread.disaster.area/T/#u" class="text-cyan-400 hover:text-cyan-200 hover:underline">Dave Chinner's design guidance, 2023-03-08</a> — the inflection point.</li>
+<li class="leading-relaxed"><a href="https://lore.kernel.org/all/20241113094727.1497722-1-mcgrof@kernel.org/T/#mdea8649dd7254d1237d358c53dff17b02a60bf33" class="text-cyan-400 hover:text-cyan-200 hover:underline">Luis Chamberlain's large sector sizes RFC, 2024-11-13</a> — the lead-in to the bdev-cache LBS work.</li>
+<li class="leading-relaxed"><a href="https://github.com/linux-kdevops/kdevops" class="text-cyan-400 hover:text-cyan-200 hover:underline">linux-kdevops</a> — the test orchestration framework that exercised the 2023+ LBS series end-to-end.</li>
+</ul>
+    </article>
+
+    <footer class="text-center text-gray-600 text-sm mt-12 pt-8 border-t border-gray-800">
+      <p class="mb-2">
+        <a href="../index.html" class="hover:text-gray-400">fs-features</a>
+        <span class="mx-2">&middot;</span>
+        <a href="index.html" class="hover:text-gray-400">case studies</a>
+        <span class="mx-2">&middot;</span>
+        <a href="https://github.com/mcgrof/fs-features" class="hover:text-gray-400">source</a>
+      </p>
+      <p>MIT License &middot; Luis Chamberlain and contributors</p>
+    </footer>
+  </div>
+</body>
+</html>

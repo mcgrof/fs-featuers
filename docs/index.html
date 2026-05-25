@@ -61,6 +61,10 @@
            class="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg font-medium">
           findings
         </a>
+        <a href="case_studies/index.html"
+           class="px-4 py-2 bg-cyan-900 hover:bg-cyan-800 text-cyan-200 rounded-lg font-medium">
+          case studies
+        </a>
       </div>
     </header>
 
@@ -85,7 +89,7 @@
             </tr>
           </thead>
           <tbody>
-
+            
     <tr class="border-b border-gray-800">
       <td class="py-2 px-3 text-gray-300">RFC -&gt; merge (all)</td>
       <td class="py-2 px-3 text-center text-gray-400">55</td>
@@ -94,7 +98,7 @@
       <td class="py-2 px-3 text-right font-mono text-amber-300">1.27y</td>
       <td class="py-2 px-3 text-right font-mono text-rose-300">4.98y</td>
     </tr>
-
+    
 
     <tr class="border-b border-gray-800">
       <td class="py-2 px-3 text-gray-300">RFC -&gt; merge (LBS excluded)</td>
@@ -104,7 +108,7 @@
       <td class="py-2 px-3 text-right font-mono text-amber-300">1.29y</td>
       <td class="py-2 px-3 text-right font-mono text-rose-300">4.98y</td>
     </tr>
-
+    
 
     <tr class="border-b border-gray-800">
       <td class="py-2 px-3 text-gray-300">Merge -&gt; enterprise (all)</td>
@@ -114,7 +118,7 @@
       <td class="py-2 px-3 text-right font-mono text-amber-300">2.95y</td>
       <td class="py-2 px-3 text-right font-mono text-rose-300">8.05y</td>
     </tr>
-
+    
 
     <tr class="border-b border-gray-800">
       <td class="py-2 px-3 text-gray-300">RFC -&gt; enterprise (all)</td>
@@ -124,7 +128,7 @@
       <td class="py-2 px-3 text-right font-mono text-amber-300">4.29y</td>
       <td class="py-2 px-3 text-right font-mono text-rose-300">8.09y</td>
     </tr>
-
+    
 
     <tr class="border-b border-gray-800">
       <td class="py-2 px-3 text-gray-300">btrfs RFC -&gt; merge</td>
@@ -134,7 +138,7 @@
       <td class="py-2 px-3 text-right font-mono text-amber-300">0.96y</td>
       <td class="py-2 px-3 text-right font-mono text-rose-300">1.51y</td>
     </tr>
-
+    
 
     <tr class="border-b border-gray-800">
       <td class="py-2 px-3 text-gray-300">ext4 RFC -&gt; merge</td>
@@ -144,7 +148,7 @@
       <td class="py-2 px-3 text-right font-mono text-amber-300">1.12y</td>
       <td class="py-2 px-3 text-right font-mono text-rose-300">3.12y</td>
     </tr>
-
+    
 
     <tr class="border-b border-gray-800">
       <td class="py-2 px-3 text-gray-300">xfs RFC -&gt; merge</td>
@@ -154,7 +158,7 @@
       <td class="py-2 px-3 text-right font-mono text-amber-300">1.49y</td>
       <td class="py-2 px-3 text-right font-mono text-rose-300">4.98y</td>
     </tr>
-
+    
 
     <tr class="border-b border-gray-800">
       <td class="py-2 px-3 text-gray-300">mm_impact=none RFC -&gt; merge</td>
@@ -164,7 +168,7 @@
       <td class="py-2 px-3 text-right font-mono text-amber-300">1.24y</td>
       <td class="py-2 px-3 text-right font-mono text-rose-300">4.98y</td>
     </tr>
-
+    
 
     <tr class="border-b border-gray-800">
       <td class="py-2 px-3 text-gray-300">mm_impact=minor RFC -&gt; merge</td>
@@ -174,7 +178,7 @@
       <td class="py-2 px-3 text-right font-mono text-amber-300">1.29y</td>
       <td class="py-2 px-3 text-right font-mono text-rose-300">3.12y</td>
     </tr>
-
+    
 
     <tr class="border-b border-gray-800">
       <td class="py-2 px-3 text-gray-300">mm_impact=major RFC -&gt; merge</td>
@@ -184,7 +188,7 @@
       <td class="py-2 px-3 text-right font-mono text-amber-300">0.91y</td>
       <td class="py-2 px-3 text-right font-mono text-rose-300">0.97y</td>
     </tr>
-
+    
           </tbody>
         </table>
       </div>
@@ -235,7 +239,7 @@
       </div>
 
       <div class="grid md:grid-cols-3 gap-4 mb-6">
-
+        
         <div class="card rounded-lg p-5 border-l-4 border-cyan-500">
           <h3 class="font-semibold text-cyan-400 mb-2">XFS LBS</h3>
           <p class="text-gray-400 text-xs mb-2">
@@ -258,7 +262,7 @@
             </div>
           </div>
         </div>
-
+        
 
         <div class="card rounded-lg p-5 border-l-4 border-emerald-500">
           <h3 class="font-semibold text-emerald-400 mb-2">BTRFS LBS</h3>
@@ -282,7 +286,7 @@
             </div>
           </div>
         </div>
-
+        
 
         <div class="card rounded-lg p-5 border-l-4 border-purple-500">
           <h3 class="font-semibold text-purple-400 mb-2">EXT4 LBS</h3>
@@ -306,7 +310,7 @@
             </div>
           </div>
         </div>
-
+        
       </div>
 
       <div class="card rounded-xl p-6">
@@ -324,6 +328,64 @@
 
       <div class="figure mt-6">
         <img src="images/lbs_per_fs.png" alt="LBS adoption per fs">
+      </div>
+
+      <div class="mt-6 card rounded-xl p-6 border-l-4 border-cyan-500">
+        <div class="flex items-start justify-between">
+          <div>
+            <h3 class="font-semibold text-lg mb-2 text-cyan-300">
+              Full LBS case study
+            </h3>
+            <p class="text-gray-300 text-sm">
+              A long-form biography of LBS in three phases: Lameter 2007 ->
+              Piggin fsblock -> Chinner 2014/2018 -> Raghav 2023, then the
+              v6.15 block-device cache work that unlocked ext4, then ext4
+              and btrfs in 2025. Every commit, every stalled attempt, every
+              reference.
+            </p>
+          </div>
+          <a href="case_studies/lbs.html"
+             class="ml-4 px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg font-medium text-sm whitespace-nowrap">
+            read &rarr;
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="mb-14" id="case-studies">
+      <div class="camp-header">
+        <h2 class="text-2xl font-bold">Case studies</h2>
+        <p class="text-gray-500 text-sm mt-1">
+          Per-feature long-form biographies written by the people who lived
+          through the work. Read the
+          <a href="case_studies/index.html" class="text-cyan-400 hover:underline">index</a>
+          or pitch a new one.
+        </p>
+      </div>
+      <div class="card rounded-xl p-6">
+        <p class="text-gray-300 text-sm mb-3">
+          If you maintained, designed, or stabilized a major Linux
+          filesystem feature, please consider contributing a case study.
+          The catalog row gives the numbers; only the people who were on
+          the threads can give the context. We are especially looking for
+          biographies of features that touched core mm: DAX, large
+          folios, idmapped mounts, the buffer-head retirement effort, and
+          the next round of MM-impact filesystem work.
+        </p>
+        <div class="flex flex-wrap gap-3 text-sm">
+          <a href="case_studies/index.html"
+             class="px-4 py-2 bg-cyan-900 hover:bg-cyan-800 text-cyan-200 rounded-lg font-medium">
+            browse case studies
+          </a>
+          <a href="https://github.com/mcgrof/fs-features/blob/master/CONTRIBUTING.md"
+             class="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg font-medium">
+            how to contribute
+          </a>
+          <a href="case_studies/lbs.md"
+             class="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg font-medium">
+            template (lbs.md)
+          </a>
+        </div>
       </div>
     </section>
 
@@ -359,7 +421,7 @@
       </div>
     </section>
 
-
+    
         <section class="mb-14" id="xfs">
           <div class="camp-header">
             <h2 class="text-2xl font-bold">XFS</h2>
@@ -368,7 +430,7 @@
             </p>
           </div>
           <div class="grid gap-4">
-
+            
     <div class="card rounded-lg p-5 border-l-4 border-cyan-500">
       <div class="flex items-start justify-between mb-2">
         <h3 class="font-semibold text-cyan-400">Delayed logging</h3>
@@ -394,7 +456,7 @@
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-cyan-500">
       <div class="flex items-start justify-between mb-2">
@@ -417,11 +479,11 @@
         </div>
         <div>
           <span class="text-gray-500">Fixes:</span> 0
-
+          
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-cyan-500">
       <div class="flex items-start justify-between mb-2">
@@ -444,11 +506,11 @@
         </div>
         <div>
           <span class="text-gray-500">Fixes:</span> 0
-
+          
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-cyan-500">
       <div class="flex items-start justify-between mb-2">
@@ -471,11 +533,11 @@
         </div>
         <div>
           <span class="text-gray-500">Fixes:</span> 0
-
+          
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-cyan-500">
       <div class="flex items-start justify-between mb-2">
@@ -502,7 +564,7 @@
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-cyan-500">
       <div class="flex items-start justify-between mb-2">
@@ -525,11 +587,11 @@
         </div>
         <div>
           <span class="text-gray-500">Fixes:</span> 0
-
+          
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-cyan-500">
       <div class="flex items-start justify-between mb-2">
@@ -552,11 +614,11 @@
         </div>
         <div>
           <span class="text-gray-500">Fixes:</span> 0
-
+          
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-cyan-500">
       <div class="flex items-start justify-between mb-2">
@@ -583,7 +645,7 @@
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-cyan-500">
       <div class="flex items-start justify-between mb-2">
@@ -606,11 +668,11 @@
         </div>
         <div>
           <span class="text-gray-500">Fixes:</span> 0
-
+          
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-cyan-500">
       <div class="flex items-start justify-between mb-2">
@@ -633,11 +695,11 @@
         </div>
         <div>
           <span class="text-gray-500">Fixes:</span> 0
-
+          
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-cyan-500">
       <div class="flex items-start justify-between mb-2">
@@ -660,11 +722,11 @@
         </div>
         <div>
           <span class="text-gray-500">Fixes:</span> 0
-
+          
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-cyan-500">
       <div class="flex items-start justify-between mb-2">
@@ -691,7 +753,7 @@
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-cyan-500">
       <div class="flex items-start justify-between mb-2">
@@ -714,11 +776,11 @@
         </div>
         <div>
           <span class="text-gray-500">Fixes:</span> 0
-
+          
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-cyan-500">
       <div class="flex items-start justify-between mb-2">
@@ -745,7 +807,7 @@
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-cyan-500">
       <div class="flex items-start justify-between mb-2">
@@ -768,11 +830,11 @@
         </div>
         <div>
           <span class="text-gray-500">Fixes:</span> 0
-
+          
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-cyan-500">
       <div class="flex items-start justify-between mb-2">
@@ -795,11 +857,11 @@
         </div>
         <div>
           <span class="text-gray-500">Fixes:</span> 0
-
+          
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-cyan-500">
       <div class="flex items-start justify-between mb-2">
@@ -822,11 +884,11 @@
         </div>
         <div>
           <span class="text-gray-500">Fixes:</span> 0
-
+          
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-cyan-500">
       <div class="flex items-start justify-between mb-2">
@@ -849,11 +911,11 @@
         </div>
         <div>
           <span class="text-gray-500">Fixes:</span> 0
-
+          
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-cyan-500">
       <div class="flex items-start justify-between mb-2">
@@ -876,11 +938,11 @@
         </div>
         <div>
           <span class="text-gray-500">Fixes:</span> 0
-
+          
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-cyan-500">
       <div class="flex items-start justify-between mb-2">
@@ -903,11 +965,11 @@
         </div>
         <div>
           <span class="text-gray-500">Fixes:</span> 0
-
+          
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-cyan-500">
       <div class="flex items-start justify-between mb-2">
@@ -930,11 +992,11 @@
         </div>
         <div>
           <span class="text-gray-500">Fixes:</span> 0
-
+          
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-cyan-500">
       <div class="flex items-start justify-between mb-2">
@@ -957,15 +1019,15 @@
         </div>
         <div>
           <span class="text-gray-500">Fixes:</span> 0
-
+          
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-cyan-500">
       <div class="flex items-start justify-between mb-2">
-        <h3 class="font-semibold text-cyan-400">Large Block Sizes (LBS)<span class="ml-2 px-2 py-0.5 text-xs rounded bg-yellow-900 text-yellow-300">LBS</span></h3>
+        <h3 class="font-semibold text-cyan-400">Large Block Sizes (LBS)<span class="ml-2 px-2 py-0.5 text-xs rounded bg-yellow-900 text-yellow-300">LBS</span><a href="case_studies/lbs.html" class="ml-2 px-2 py-0.5 text-xs rounded bg-cyan-900 text-cyan-300 hover:bg-cyan-800 hover:text-cyan-100">case study &rarr;</a></h3>
         <span class="text-xs bg-cyan-900 text-cyan-300 px-2 py-1 rounded">xfs</span>
       </div>
       <p class="text-gray-400 text-sm mb-3">Filesystem block size larger than PAGE_SIZE on XFS, enabled by a multi-year stack of mm and iomap changes: large folios, mapping_set_folio_min_order, FS_LBS gating, and an LBS-aware block layer. The first XFS feature whose schedule visibly accelerated under kdevops-driven automated testing.</p>
@@ -988,7 +1050,7 @@
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-cyan-500">
       <div class="flex items-start justify-between mb-2">
@@ -1015,10 +1077,10 @@
         </div>
       </div>
     </div>
-
+    
           </div>
         </section>
-
+        
         <section class="mb-14" id="ext4">
           <div class="camp-header">
             <h2 class="text-2xl font-bold">ext4</h2>
@@ -1027,7 +1089,7 @@
             </p>
           </div>
           <div class="grid gap-4">
-
+            
     <div class="card rounded-lg p-5 border-l-4 border-purple-500">
       <div class="flex items-start justify-between mb-2">
         <h3 class="font-semibold text-purple-400">Extents and 64-bit</h3>
@@ -1049,11 +1111,11 @@
         </div>
         <div>
           <span class="text-gray-500">Fixes:</span> 0
-
+          
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-purple-500">
       <div class="flex items-start justify-between mb-2">
@@ -1080,7 +1142,7 @@
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-purple-500">
       <div class="flex items-start justify-between mb-2">
@@ -1103,11 +1165,11 @@
         </div>
         <div>
           <span class="text-gray-500">Fixes:</span> 0
-
+          
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-purple-500">
       <div class="flex items-start justify-between mb-2">
@@ -1134,7 +1196,7 @@
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-purple-500">
       <div class="flex items-start justify-between mb-2">
@@ -1157,11 +1219,11 @@
         </div>
         <div>
           <span class="text-gray-500">Fixes:</span> 0
-
+          
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-purple-500">
       <div class="flex items-start justify-between mb-2">
@@ -1184,11 +1246,11 @@
         </div>
         <div>
           <span class="text-gray-500">Fixes:</span> 0
-
+          
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-purple-500">
       <div class="flex items-start justify-between mb-2">
@@ -1215,7 +1277,7 @@
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-purple-500">
       <div class="flex items-start justify-between mb-2">
@@ -1242,7 +1304,7 @@
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-purple-500">
       <div class="flex items-start justify-between mb-2">
@@ -1265,11 +1327,11 @@
         </div>
         <div>
           <span class="text-gray-500">Fixes:</span> 0
-
+          
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-purple-500">
       <div class="flex items-start justify-between mb-2">
@@ -1296,7 +1358,7 @@
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-purple-500">
       <div class="flex items-start justify-between mb-2">
@@ -1323,7 +1385,7 @@
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-purple-500">
       <div class="flex items-start justify-between mb-2">
@@ -1346,15 +1408,15 @@
         </div>
         <div>
           <span class="text-gray-500">Fixes:</span> 0
-
+          
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-purple-500">
       <div class="flex items-start justify-between mb-2">
-        <h3 class="font-semibold text-purple-400">Large Block Sizes (LBS)<span class="ml-2 px-2 py-0.5 text-xs rounded bg-yellow-900 text-yellow-300">LBS</span></h3>
+        <h3 class="font-semibold text-purple-400">Large Block Sizes (LBS)<span class="ml-2 px-2 py-0.5 text-xs rounded bg-yellow-900 text-yellow-300">LBS</span><a href="case_studies/lbs.html" class="ml-2 px-2 py-0.5 text-xs rounded bg-cyan-900 text-cyan-300 hover:bg-cyan-800 hover:text-cyan-100">case study &rarr;</a></h3>
         <span class="text-xs bg-purple-900 text-purple-300 px-2 py-1 rounded">ext4</span>
       </div>
       <p class="text-gray-400 text-sm mb-3">Block sizes larger than PAGE_SIZE on ext4. Lands after XFS once the underlying mm and iomap large-folio infrastructure was already in place.</p>
@@ -1373,14 +1435,14 @@
         </div>
         <div>
           <span class="text-gray-500">Fixes:</span> 0
-
+          
         </div>
       </div>
     </div>
-
+    
           </div>
         </section>
-
+        
         <section class="mb-14" id="btrfs">
           <div class="camp-header">
             <h2 class="text-2xl font-bold">btrfs</h2>
@@ -1389,7 +1451,7 @@
             </p>
           </div>
           <div class="grid gap-4">
-
+            
     <div class="card rounded-lg p-5 border-l-4 border-emerald-500">
       <div class="flex items-start justify-between mb-2">
         <h3 class="font-semibold text-emerald-400">Mixed block groups</h3>
@@ -1411,11 +1473,11 @@
         </div>
         <div>
           <span class="text-gray-500">Fixes:</span> 0
-
+          
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-emerald-500">
       <div class="flex items-start justify-between mb-2">
@@ -1438,11 +1500,11 @@
         </div>
         <div>
           <span class="text-gray-500">Fixes:</span> 0
-
+          
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-emerald-500">
       <div class="flex items-start justify-between mb-2">
@@ -1469,7 +1531,7 @@
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-emerald-500">
       <div class="flex items-start justify-between mb-2">
@@ -1492,11 +1554,11 @@
         </div>
         <div>
           <span class="text-gray-500">Fixes:</span> 0
-
+          
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-emerald-500">
       <div class="flex items-start justify-between mb-2">
@@ -1523,7 +1585,7 @@
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-emerald-500">
       <div class="flex items-start justify-between mb-2">
@@ -1550,7 +1612,7 @@
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-emerald-500">
       <div class="flex items-start justify-between mb-2">
@@ -1573,11 +1635,11 @@
         </div>
         <div>
           <span class="text-gray-500">Fixes:</span> 0
-
+          
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-emerald-500">
       <div class="flex items-start justify-between mb-2">
@@ -1600,11 +1662,11 @@
         </div>
         <div>
           <span class="text-gray-500">Fixes:</span> 0
-
+          
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-emerald-500">
       <div class="flex items-start justify-between mb-2">
@@ -1631,7 +1693,7 @@
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-emerald-500">
       <div class="flex items-start justify-between mb-2">
@@ -1658,7 +1720,7 @@
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-emerald-500">
       <div class="flex items-start justify-between mb-2">
@@ -1681,11 +1743,11 @@
         </div>
         <div>
           <span class="text-gray-500">Fixes:</span> 0
-
+          
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-emerald-500">
       <div class="flex items-start justify-between mb-2">
@@ -1708,11 +1770,11 @@
         </div>
         <div>
           <span class="text-gray-500">Fixes:</span> 0
-
+          
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-emerald-500">
       <div class="flex items-start justify-between mb-2">
@@ -1735,11 +1797,11 @@
         </div>
         <div>
           <span class="text-gray-500">Fixes:</span> 0
-
+          
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-emerald-500">
       <div class="flex items-start justify-between mb-2">
@@ -1766,7 +1828,7 @@
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-emerald-500">
       <div class="flex items-start justify-between mb-2">
@@ -1789,11 +1851,11 @@
         </div>
         <div>
           <span class="text-gray-500">Fixes:</span> 0
-
+          
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-emerald-500">
       <div class="flex items-start justify-between mb-2">
@@ -1820,7 +1882,7 @@
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-emerald-500">
       <div class="flex items-start justify-between mb-2">
@@ -1847,11 +1909,11 @@
         </div>
       </div>
     </div>
-
+    
 
     <div class="card rounded-lg p-5 border-l-4 border-emerald-500">
       <div class="flex items-start justify-between mb-2">
-        <h3 class="font-semibold text-emerald-400">Large Block Sizes (LBS)<span class="ml-2 px-2 py-0.5 text-xs rounded bg-yellow-900 text-yellow-300">LBS</span></h3>
+        <h3 class="font-semibold text-emerald-400">Large Block Sizes (LBS)<span class="ml-2 px-2 py-0.5 text-xs rounded bg-yellow-900 text-yellow-300">LBS</span><a href="case_studies/lbs.html" class="ml-2 px-2 py-0.5 text-xs rounded bg-cyan-900 text-cyan-300 hover:bg-cyan-800 hover:text-cyan-100">case study &rarr;</a></h3>
         <span class="text-xs bg-emerald-900 text-emerald-300 px-2 py-1 rounded">btrfs</span>
       </div>
       <p class="text-gray-400 text-sm mb-3">Block sizes larger than PAGE_SIZE on btrfs. Followed XFS and rode the same mm/iomap large-folio runway; btrfs further had to extend its pre-existing subpage machinery to symmetric bs &gt; ps territory.</p>
@@ -1874,10 +1936,10 @@
         </div>
       </div>
     </div>
-
+    
           </div>
         </section>
-
+        
 
     <section class="mb-14" id="method">
       <div class="camp-header">
