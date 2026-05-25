@@ -21,6 +21,9 @@ SKIP_DIRS = {
     "dist",
 }
 SKIP_EXTS = {".png", ".jpg", ".jpeg", ".gif", ".pdf", ".ico", ".woff", ".woff2"}
+# Deployment artifacts whose exact byte contents matter -- adding a
+# trailing newline to CNAME confuses some GitHub Pages configurations.
+SKIP_NAMES = {"CNAME"}
 
 
 def fix_text(text: str) -> tuple[str, int]:
@@ -85,6 +88,8 @@ def iter_files(root: Path):
         if any(part in SKIP_DIRS for part in path.parts):
             continue
         if path.suffix.lower() in SKIP_EXTS:
+            continue
+        if path.name in SKIP_NAMES:
             continue
         yield path
 
