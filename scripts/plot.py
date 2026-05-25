@@ -7,10 +7,14 @@ Outputs to docs/images/:
   timeline.png            -- RFC/merge/enterprise gantt per feature
   rfc_to_merge_bars.png   -- per-feature RFC-to-merge bar chart
   merge_to_enterprise.png -- per-feature merge-to-enterprise bar chart
-  lbs_biography.png       -- LBS timeline with prior failed attempts
-  lbs_per_fs.png          -- LBS adoption sequence (XFS -> btrfs -> ext4)
   mm_impact_compare.png   -- RFC-to-merge by mm-impact bucket
   fixes_distribution.png  -- post-merge Fixes-tag fan-out distribution
+
+Outputs to docs/case_studies/images/:
+  lbs_biography.png       -- LBS arc, 2007 -> 2026
+  lbs_per_fs.png          -- LBS adoption sequence (XFS -> btrfs -> ext4)
+  lbs_xfs_v6_12.png       -- Phase 1: seven mm/iomap/xfs commits, Aug-Sep 2024
+  lbs_bdev_v6_15.png      -- Phase 2: bdev + buffer-head series, Dec 2024-Mar 2025
 """
 
 from __future__ import annotations
@@ -31,6 +35,7 @@ from matplotlib.patches import Patch
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
 IMAGES = ROOT / "docs" / "images"
+CASE_STUDY_IMAGES = ROOT / "docs" / "case_studies" / "images"
 
 # Dark theme matching the knlp.io aesthetic
 BG = "#0f172a"
@@ -91,13 +96,75 @@ def fig_setup(figsize=(12, 7), title=None):
     return fig, ax
 
 
-def save(fig, name):
-    IMAGES.mkdir(parents=True, exist_ok=True)
-    out = IMAGES / name
+def save(fig, name, dest: Path = IMAGES):
+    dest.mkdir(parents=True, exist_ok=True)
+    out = dest / name
     fig.tight_layout()
     fig.savefig(out, dpi=140, facecolor=BG, bbox_inches="tight")
     plt.close(fig)
     print(f"wrote {out}")
+
+
+def _stack_event_labels(events, lane_step=0.32, min_days=500, baseline=0.0):
+    """Place a list of (date, label, color) events on a horizontal
+    timeline with collision-free labels stacked into discrete y-lanes
+    alternating above/below the baseline. Returns a list of
+    (date, label, color, sign, lane) placements ready for annotation.
+    """
+    from datetime import timedelta
+
+    last_x: dict[tuple[int, int], object] = {}
+    placements = []
+    for i, (d, label, color) in enumerate(events):
+        sign = 1 if i % 2 == 0 else -1
+        lane = 1
+        while True:
+            prev_x = last_x.get((sign, lane))
+            if prev_x is None or (d - prev_x) >= timedelta(days=min_days):
+                last_x[(sign, lane)] = d
+                placements.append((d, label, color, sign, lane))
+                break
+            lane += 1
+    return placements
+
+
+def _render_event_timeline(
+    ax, events, baseline=0.0, lane_step=0.32, min_days=500, marker_size=240,
+):
+    """Render a stacked-label event timeline onto ax. Mutates ax in place
+    and returns the placements list."""
+    placements = _stack_event_labels(events, lane_step, min_days, baseline)
+    xs = [e[0] for e in events]
+    colors = [e[2] for e in events]
+    ax.axhline(baseline, color=AXIS, linewidth=1.5, alpha=0.7, zorder=0)
+    ax.scatter(
+        xs, [baseline] * len(events), c=colors, s=marker_size, zorder=3,
+        edgecolors=TEXT, linewidth=1.2,
+    )
+    for d, label, color, sign, lane in placements:
+        y = baseline + sign * (0.18 + lane_step * (lane - 1))
+        va = "bottom" if sign > 0 else "top"
+        ax.annotate(
+            f"{label}\n{d.isoformat()}",
+            xy=(d, baseline), xytext=(d, y),
+            ha="center", va=va, color=TEXT, fontsize=9, fontweight="bold",
+            arrowprops=dict(arrowstyle="-", color=AXIS, lw=0.6),
+        )
+    max_up = max(
+        (lane for (_, _, _, sign, lane) in placements if sign > 0), default=0
+    )
+    max_dn = max(
+        (lane for (_, _, _, sign, lane) in placements if sign < 0), default=0
+    )
+    top = 0.18 + lane_step * max_up + 0.55
+    bot = -(0.18 + lane_step * max_dn + 0.55)
+    ax.set_ylim(bot, top)
+    ax.set_yticks([])
+    ax.spines["left"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    ax.spines["top"].set_visible(False)
+    ax.set_xlabel("")
+    return placements
 
 
 def plot_timeline(features):
@@ -304,15 +371,8 @@ def plot_merge_to_enterprise(features):
 
 
 def plot_lbs_biography(features):
-    """Timeline showing LBS's 17-year arc of attempts.
-
-    Layout strategy: every event sits on the time axis as a colored marker,
-    and labels stack into discrete y-lanes alternating above/below the
-    baseline. A label whose horizontal extent would overlap the previous
-    label on the same side gets pushed to the next lane out. This is
-    cheaper and more predictable than the prior heuristic and reads
-    cleanly even when events are months apart.
-    """
+    """Full LBS arc, from Lameter 2007 to LBS-everywhere. Lives under the
+    case-study tree so the case_studies/lbs.html page can embed it."""
     fig, ax = fig_setup(
         figsize=(15, 6.5),
         title="LBS biography: from Lameter 2007 to LBS-everywhere 2026",
@@ -340,101 +400,25 @@ def plot_lbs_biography(features):
     rhel = parse_date(lbs_xfs.get("rhel_first_date"))
     if rhel:
         events.append((rhel, "RHEL 10 TP", "#22d3ee"))
-    # Phase 2 + 3 markers: the v6.15 bdev work and the ext4/btrfs landings
-    ext4 = next(
-        (f for f in features if f["short_name"] == "ext4_lbs"), None
-    )
-    btrfs = next(
-        (f for f in features if f["short_name"] == "btrfs_lbs"), None
-    )
+    ext4 = next((f for f in features if f["short_name"] == "ext4_lbs"), None)
+    btrfs = next((f for f in features if f["short_name"] == "btrfs_lbs"), None)
     if btrfs and btrfs.get("merged_date"):
         events.append(
-            (
-                parse_date(btrfs["merged_date"]),
-                "btrfs LBS v6.18 (exp.)",
-                "#34d399",
-            )
+            (parse_date(btrfs["merged_date"]), "btrfs LBS v6.18 (exp.)", "#34d399")
         )
     if ext4 and ext4.get("merged_date"):
         events.append(
-            (
-                parse_date(ext4["merged_date"]),
-                "ext4 LBS v6.19",
-                "#a78bfa",
-            )
+            (parse_date(ext4["merged_date"]), "ext4 LBS v6.19", "#a78bfa")
         )
 
     events = [e for e in events if e[0]]
     events.sort(key=lambda e: e[0])
 
-    xs = [e[0] for e in events]
-    colors = [e[2] for e in events]
-    baseline_y = 0.0
+    _render_event_timeline(ax, events)
 
-    # Baseline + markers
-    ax.axhline(baseline_y, color=AXIS, linewidth=1.5, alpha=0.7, zorder=0)
-    ax.scatter(
-        xs, [baseline_y] * len(events), c=colors, s=240, zorder=3,
-        edgecolors=TEXT, linewidth=1.2,
-    )
-
-    # Lane assignment: label per event gets a (sign, lane) where sign is
-    # +1 above or -1 below, and lane is 1..N distance from baseline.
-    # Lanes alternate sides as you walk left-to-right. Adjacent labels
-    # within MIN_DAYS get bumped to a further lane on the same side.
-    from datetime import timedelta
-
-    MIN_DAYS = 500  # below this gap we treat labels as colliding
-    lane_step = 0.32
-    # Track last x per (sign, lane) so we know if a new label collides
-    last_x: dict[tuple[int, int], object] = {}
-    placements = []
-    for i, (d, label, color) in enumerate(events):
-        sign = 1 if i % 2 == 0 else -1
-        lane = 1
-        while True:
-            prev_x = last_x.get((sign, lane))
-            if prev_x is None or (d - prev_x) >= timedelta(days=MIN_DAYS):
-                last_x[(sign, lane)] = d
-                placements.append((d, label, color, sign, lane))
-                break
-            lane += 1
-
-    # Render labels with a small leader line
-    for d, label, color, sign, lane in placements:
-        y = baseline_y + sign * (0.18 + lane_step * (lane - 1))
-        va = "bottom" if sign > 0 else "top"
-        ax.annotate(
-            f"{label}\n{d.isoformat()}",
-            xy=(d, baseline_y),
-            xytext=(d, y),
-            ha="center",
-            va=va,
-            color=TEXT,
-            fontsize=9,
-            fontweight="bold",
-            arrowprops=dict(arrowstyle="-", color=AXIS, lw=0.6),
-        )
-
-    # Y-limits sized to the deepest lane used on either side
-    max_lane_up = max(
-        (lane for (_, _, _, sign, lane) in placements if sign > 0), default=0
-    )
-    max_lane_dn = max(
-        (lane for (_, _, _, sign, lane) in placements if sign < 0), default=0
-    )
-    top = 0.18 + lane_step * max_lane_up + 0.55
-    bot = -(0.18 + lane_step * max_lane_dn + 0.55)
-    ax.set_ylim(bot, top)
-    ax.set_yticks([])
     ax.xaxis.set_major_locator(mdates.YearLocator(2))
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
-    ax.spines["left"].set_visible(False)
-    ax.spines["right"].set_visible(False)
-    ax.spines["top"].set_visible(False)
-    ax.set_xlabel("")
 
-    # Mini legend for the colors
     legend_elements = [
         Patch(facecolor="#fb923c", label="prior stalled attempt"),
         Patch(facecolor="#fde047", label="RFC that landed"),
@@ -443,17 +427,91 @@ def plot_lbs_biography(features):
         Patch(facecolor="#22d3ee", label="enterprise pickup"),
     ]
     leg = ax.legend(
-        handles=legend_elements,
-        loc="upper left",
-        facecolor=PANEL,
-        edgecolor=AXIS,
-        fontsize=8,
-        framealpha=0.85,
+        handles=legend_elements, loc="upper left",
+        facecolor=PANEL, edgecolor=AXIS, fontsize=8, framealpha=0.85,
     )
     for t in leg.get_texts():
         t.set_color(TEXT)
 
-    save(fig, "lbs_biography.png")
+    save(fig, "lbs_biography.png", dest=CASE_STUDY_IMAGES)
+
+
+def plot_lbs_xfs_v6_12():
+    """Per-phase timeline: the seven mm/iomap/xfs commits that landed
+    XFS LBS in v6.12 (late Aug -- early Sep 2024)."""
+    from datetime import date as _date
+
+    fig, ax = fig_setup(
+        figsize=(15, 5.5),
+        title="Phase 1: XFS LBS lands in v6.12 (seven commits, late Aug -- early Sep 2024)",
+    )
+    events = [
+        (_date(2024, 8, 23), "filemap: mapping_min_order folios", "#22d3ee"),
+        (_date(2024, 8, 23), "readahead: mapping_min_order in readahead", "#22d3ee"),
+        (_date(2024, 9, 2),  "mm: split folio in min-order chunks", "#22d3ee"),
+        (_date(2024, 9, 2),  "filemap: cap PTE range in folio_map_range", "#22d3ee"),
+        (_date(2024, 9, 2),  "iomap: fix iomap_dio_zero for bs > ps", "#fb923c"),
+        (_date(2024, 9, 2),  "xfs: expose block size in stat", "#34d399"),
+        (_date(2024, 9, 2),  "xfs: generic xfs_sb_validate_fsb_count", "#34d399"),
+        (_date(2024, 9, 3),  "xfs: enable bs > ps support", "#fde047"),
+    ]
+
+    _render_event_timeline(ax, events, min_days=3, lane_step=0.30)
+    ax.xaxis.set_major_locator(mdates.DayLocator(interval=2))
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%b %d"))
+
+    legend_elements = [
+        Patch(facecolor="#22d3ee", label="mm / page cache"),
+        Patch(facecolor="#fb923c", label="iomap"),
+        Patch(facecolor="#34d399", label="XFS plumbing"),
+        Patch(facecolor="#fde047", label="XFS enable LBS"),
+    ]
+    leg = ax.legend(
+        handles=legend_elements, loc="upper left",
+        facecolor=PANEL, edgecolor=AXIS, fontsize=8, framealpha=0.85,
+    )
+    for t in leg.get_texts():
+        t.set_color(TEXT)
+    save(fig, "lbs_xfs_v6_12.png", dest=CASE_STUDY_IMAGES)
+
+
+def plot_lbs_bdev_v6_15():
+    """Per-phase timeline: the v6.15 'Enable bs > ps for block devices'
+    series that lifted LBS through the bdev cache + buffer-head path,
+    setting the stage for ext4 LBS."""
+    from datetime import date as _date
+
+    fig, ax = fig_setup(
+        figsize=(15, 5.5),
+        title="Phase 2: bdev cache + buffer heads for LBS (v6.15, Dec 2024 -- Mar 2025)",
+    )
+    events = [
+        (_date(2024, 12, 18), "block/bdev: helper for max block size check", "#22d3ee"),
+        (_date(2025, 2, 24),  "fs/buffer: simplify block_read_full_folio", "#fb923c"),
+        (_date(2025, 2, 24),  "fs/mpage: blocks_per_folio vs blocks_per_page", "#fb923c"),
+        (_date(2025, 2, 24),  "fs/buffer + fs/mpage: drop large folio guard", "#fb923c"),
+        (_date(2025, 2, 24),  "block/bdev: lift block size limit to 64k", "#22d3ee"),
+        (_date(2025, 2, 24),  "block/bdev: enable large folios for LBS", "#22d3ee"),
+        (_date(2025, 2, 24),  "bdev: bdev_io_min() for statx block size", "#22d3ee"),
+        (_date(2025, 3, 7),   "FS_LBS flag gate in include/linux/fs.h", "#fde047"),
+    ]
+
+    _render_event_timeline(ax, events, min_days=14, lane_step=0.30)
+    ax.xaxis.set_major_locator(mdates.MonthLocator())
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m"))
+
+    legend_elements = [
+        Patch(facecolor="#22d3ee", label="block / bdev"),
+        Patch(facecolor="#fb923c", label="fs/buffer + fs/mpage"),
+        Patch(facecolor="#fde047", label="VFS gating flag"),
+    ]
+    leg = ax.legend(
+        handles=legend_elements, loc="upper left",
+        facecolor=PANEL, edgecolor=AXIS, fontsize=8, framealpha=0.85,
+    )
+    for t in leg.get_texts():
+        t.set_color(TEXT)
+    save(fig, "lbs_bdev_v6_15.png", dest=CASE_STUDY_IMAGES)
 
 
 def plot_lbs_per_fs(features):
@@ -510,7 +568,7 @@ def plot_lbs_per_fs(features):
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m"))
     ax.set_ylim(-0.7, len(rows) - 0.3)
     ax.invert_yaxis()
-    save(fig, "lbs_per_fs.png")
+    save(fig, "lbs_per_fs.png", dest=CASE_STUDY_IMAGES)
 
 
 def plot_mm_impact_compare(features):
@@ -603,10 +661,13 @@ def main(argv=None):
     plot_timeline(features)
     plot_rfc_to_merge_bars(features)
     plot_merge_to_enterprise(features)
-    plot_lbs_biography(features)
-    plot_lbs_per_fs(features)
     plot_mm_impact_compare(features)
     plot_fixes_distribution(features)
+    # Case-study figures (output into docs/case_studies/images/)
+    plot_lbs_biography(features)
+    plot_lbs_per_fs(features)
+    plot_lbs_xfs_v6_12()
+    plot_lbs_bdev_v6_15()
     return 0
 
 
