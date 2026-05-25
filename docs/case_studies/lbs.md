@@ -41,6 +41,8 @@ mailing-list and LSFMM discussions that pulled the design back into the
 ditch and out of it again, and the eventual landing across XFS, the
 block-device cache, ext4, and btrfs.
 
+![LBS biography: from Lameter 2007 to LBS-everywhere 2026](images/lbs_biography.png)
+
 ## Timeline of attempts
 
 <div class="overflow-x-auto -mx-2">
@@ -106,6 +108,8 @@ output. The prior attempts had nothing comparable; bugs that would have
 killed earlier RFCs were caught in test instead of in review.
 
 ## How LBS landed in XFS (v6.12, September 2024)
+
+![Phase 1: XFS LBS lands in v6.12, eight commits over two weeks](images/lbs_xfs_v6_12.png)
 
 The XFS LBS series merged in seven mm/iomap/fs patches:
 
@@ -176,6 +180,8 @@ broader payoff is that any future filesystem feature whose unit is
 metadata journaling, asymmetric-replication formats — gets to assume
 the substrate works.
 
+![Phase 2: bdev cache + buffer heads for LBS, Dec 2024 to Mar 2025](images/lbs_bdev_v6_15.png)
+
 The "Enable bs > ps for block devices" series authored by Luis
 Chamberlain (with review from Hannes Reinecke, Christian Brauner,
 Christoph Hellwig, and Pankaj Raghav) closed that gap in v6.15:
@@ -215,6 +221,8 @@ btrfs LBS landed as experimental in `98077f7f2180` (Qu Wenruo). btrfs
 had to extend its pre-existing subpage machinery — already used for
 4 KiB blocks on 64 KiB-page ARM systems — to symmetric bs > ps territory,
 which is why the btrfs RFC-to-merge of 0.82y is longer than ext4's.
+
+![LBS adoption per fs: XFS opened the runway, ext4 and btrfs followed](images/lbs_per_fs.png)
 
 ## Numbers
 

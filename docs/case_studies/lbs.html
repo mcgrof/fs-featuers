@@ -12,6 +12,16 @@
       border: 1px solid #334155;
     }
     a code { color: inherit; }
+    /* a markdown image followed only by the implicit alt text reads
+       as a figure caption */
+    p > img + br + em,
+    p:has(> img) > em {
+      display: block;
+      color: #94a3b8;
+      font-size: 0.875rem;
+      text-align: center;
+      margin-top: -0.75rem;
+    }
   </style>
 </head>
 <body class="min-h-screen text-gray-100">
@@ -91,6 +101,7 @@ actually mature in Linux. It catalogs every serious attempt, the
 mailing-list and LSFMM discussions that pulled the design back into the
 ditch and out of it again, and the eventual landing across XFS, the
 block-device cache, ext4, and btrfs.</p>
+<p class="text-gray-300 leading-relaxed mb-4"><img alt="LBS biography: from Lameter 2007 to LBS-everywhere 2026" src="images/lbs_biography.png" class="block w-full h-auto rounded-lg border border-gray-700 my-6 shadow-lg"></p>
 <h2 id="timeline-of-attempts" class="text-2xl font-bold mt-12 mb-4 pb-2 border-b border-gray-700 text-gray-100">Timeline of attempts</h2>
 <div class="overflow-x-auto -mx-2">
 <table class="w-full text-sm border-collapse mb-6 w-full text-sm border-collapse mb-6" class="w-full text-sm border-collapse mb-6">
@@ -149,6 +160,7 @@ workloads, and triaged with AI-assisted summarization of <code class="px-1.5 py-
 output. The prior attempts had nothing comparable; bugs that would have
 killed earlier RFCs were caught in test instead of in review.</p>
 <h2 id="how-lbs-landed-in-xfs-v612-september-2024" class="text-2xl font-bold mt-12 mb-4 pb-2 border-b border-gray-700 text-gray-100">How LBS landed in XFS (v6.12, September 2024)</h2>
+<p class="text-gray-300 leading-relaxed mb-4"><img alt="Phase 1: XFS LBS lands in v6.12, eight commits over two weeks" src="images/lbs_xfs_v6_12.png" class="block w-full h-auto rounded-lg border border-gray-700 my-6 shadow-lg"></p>
 <p class="text-gray-300 leading-relaxed mb-4">The XFS LBS series merged in seven mm/iomap/fs patches:</p>
 <ul class="list-disc ml-6 space-y-1 mb-4 text-gray-300">
 <li class="leading-relaxed"><code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">ab95d23bab22</code> filemap: allocate <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">mapping_min_order</code> folios in the page cache (2024-08-23)</li>
@@ -211,6 +223,7 @@ broader payoff is that any future filesystem feature whose unit is
 "a drive-native sector" — atomic writes proper, untorn
 metadata journaling, asymmetric-replication formats — gets to assume
 the substrate works.</p>
+<p class="text-gray-300 leading-relaxed mb-4"><img alt="Phase 2: bdev cache + buffer heads for LBS, Dec 2024 to Mar 2025" src="images/lbs_bdev_v6_15.png" class="block w-full h-auto rounded-lg border border-gray-700 my-6 shadow-lg"></p>
 <p class="text-gray-300 leading-relaxed mb-4">The "Enable bs &gt; ps for block devices" series authored by Luis
 Chamberlain (with review from Hannes Reinecke, Christian Brauner,
 Christoph Hellwig, and Pankaj Raghav) closed that gap in v6.15:</p>
@@ -245,6 +258,7 @@ reserve codepoints to merge).</p>
 had to extend its pre-existing subpage machinery — already used for
 4 KiB blocks on 64 KiB-page ARM systems — to symmetric bs &gt; ps territory,
 which is why the btrfs RFC-to-merge of 0.82y is longer than ext4's.</p>
+<p class="text-gray-300 leading-relaxed mb-4"><img alt="LBS adoption per fs: XFS opened the runway, ext4 and btrfs followed" src="images/lbs_per_fs.png" class="block w-full h-auto rounded-lg border border-gray-700 my-6 shadow-lg"></p>
 <h2 id="numbers" class="text-2xl font-bold mt-12 mb-4 pb-2 border-b border-gray-700 text-gray-100">Numbers</h2>
 <table class="w-full text-sm border-collapse mb-6">
 <thead class="border-b border-gray-700 text-gray-400">

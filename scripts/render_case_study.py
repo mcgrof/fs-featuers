@@ -72,6 +72,10 @@ TAG_CLASSES: dict[str, str] = {
         "border-l-4 border-cyan-700 pl-4 my-4 text-gray-400 italic"
     ),
     "hr": "border-gray-700 my-8",
+    "img": (
+        "block w-full h-auto rounded-lg border border-gray-700 my-6 "
+        "shadow-lg"
+    ),
 }
 
 
@@ -203,6 +207,16 @@ PAGE_TEMPLATE = """<!DOCTYPE html>
       border: 1px solid #334155;
     }}
     a code {{ color: inherit; }}
+    /* a markdown image followed only by the implicit alt text reads
+       as a figure caption */
+    p > img + br + em,
+    p:has(> img) > em {{
+      display: block;
+      color: #94a3b8;
+      font-size: 0.875rem;
+      text-align: center;
+      margin-top: -0.75rem;
+    }}
   </style>
 </head>
 <body class="min-h-screen text-gray-100">
