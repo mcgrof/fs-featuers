@@ -43,23 +43,30 @@ block-device cache, ext4, and btrfs.
 
 ## Timeline of attempts
 
-| Year | Author | Posting / venue | Outcome |
-|---|---|---|---|
-| 2007-05 | Christoph Lameter | [Variable Order Page Cache](https://lwn.net/Articles/232757/) — compound pages in the page cache | Stalled |
-| 2007-07 | Nick Piggin | [fsblock](https://lwn.net/Articles/239621/) — replace `buffer_head` to support larger blocks | Stalled |
-| 2009-03 | Nick Piggin | [Updated fsblock patches](https://lwn.net/Articles/321390/) | Did not land |
-| 2014-01 | Dave Chinner | [Why prior LBS efforts failed and what to try instead](https://lore.kernel.org/linux-mm/20140123082121.GN13997@dastard/) | Design analysis |
-| 2017-03 | LSFMM 2017 | [Page-cache larger than PAGE_SIZE](https://lwn.net/Articles/717953/) — group discussion | Inconclusive |
-| 2018-11 | Dave Chinner | [Block size > PAGE_SIZE attempt](https://lwn.net/ml/linux-fsdevel/20181107063127.3902-1-david@fromorbit.com/) | Stalled |
-| 2023-03 | Dave Chinner | [LBS design guidance to Pankaj Raghav](https://lore.kernel.org/all/20230308075952.GU2825702@dread.disaster.area/T/#u) | Inflection point |
-| 2023-09 | Pankaj Raghav et al | [Enable block size > page size in XFS](https://lore.kernel.org/all/20230915183848.1018717-1-kernel@pankajraghav.com/) | Landed |
-| 2024-09 | Pankaj Raghav | [XFS LBS merged](https://lore.kernel.org/linux-xfs/?q=7df7c204c678) — `7df7c204c678` | v6.12 |
-| 2024-11 | Luis Chamberlain | [Large sector sizes via the bdev cache](https://lore.kernel.org/all/20241113094727.1497722-1-mcgrof@kernel.org/T/#mdea8649dd7254d1237d358c53dff17b02a60bf33) | RFC |
-| 2025-02 | Luis Chamberlain | [Enable bs > ps for block devices](https://lore.kernel.org/linux-fsdevel/?q=block%2Fbdev+lift+block+size+restrictions+to+64k) — `47dd67532303` and friends | v6.15 |
-| 2025-03 | Luis Chamberlain | `FS_LBS` flag gate added to `include/linux/fs.h` — `a64e5a596067` | v6.15 |
-| 2025-09 | btrfs LBS | `98077f7f2180` (Qu Wenruo) — experimental bs > ps | v6.18 |
-| 2025-11 | ext4 LBS | `cab8cbcb923a` (Luis Chamberlain) — block sizes > PAGE_SIZE on ext4 | v6.19 |
-| 2026-01 | XFS | `4d6d335ea955` — LBS promoted from experimental together with metadirectory | v7.0 |
+<div class="overflow-x-auto -mx-2">
+<table class="w-full text-sm border-collapse mb-6">
+<thead class="border-b border-gray-700 text-gray-400">
+<tr><th class="text-left py-2 px-3 font-medium whitespace-nowrap">Year</th><th class="text-left py-2 px-3 font-medium whitespace-nowrap">Author</th><th class="text-left py-2 px-3 font-medium">Posting / venue</th><th class="text-left py-2 px-3 font-medium whitespace-nowrap">Outcome</th></tr>
+</thead>
+<tbody>
+<tr class="border-b border-gray-800"><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">2007-05</td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">Christoph Lameter</td><td class="py-2 px-3 text-gray-300 align-top"><a class="text-cyan-400 hover:text-cyan-200 hover:underline" href="https://lwn.net/Articles/232757/">Variable Order Page Cache</a> &mdash; compound pages in the page cache</td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">Stalled</td></tr>
+<tr class="border-b border-gray-800"><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">2007-07</td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">Nick Piggin</td><td class="py-2 px-3 text-gray-300 align-top"><a class="text-cyan-400 hover:text-cyan-200 hover:underline" href="https://lwn.net/Articles/239621/">fsblock</a> &mdash; replace <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">buffer_head</code> to support larger blocks</td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">Stalled</td></tr>
+<tr class="border-b border-gray-800"><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">2009-03</td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">Nick Piggin</td><td class="py-2 px-3 text-gray-300 align-top"><a class="text-cyan-400 hover:text-cyan-200 hover:underline" href="https://lwn.net/Articles/321390/">Updated fsblock patches</a></td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">Did not land</td></tr>
+<tr class="border-b border-gray-800"><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">2014-01</td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">Dave Chinner</td><td class="py-2 px-3 text-gray-300 align-top"><a class="text-cyan-400 hover:text-cyan-200 hover:underline" href="https://lore.kernel.org/linux-mm/20140123082121.GN13997@dastard/">Why prior LBS efforts failed and what to try instead</a></td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">Design analysis</td></tr>
+<tr class="border-b border-gray-800"><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">2017-03</td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">LSFMM 2017</td><td class="py-2 px-3 text-gray-300 align-top"><a class="text-cyan-400 hover:text-cyan-200 hover:underline" href="https://lwn.net/Articles/717953/">Page-cache larger than PAGE_SIZE</a> &mdash; group discussion</td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">Inconclusive</td></tr>
+<tr class="border-b border-gray-800"><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">2018-11</td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">Dave Chinner</td><td class="py-2 px-3 text-gray-300 align-top"><a class="text-cyan-400 hover:text-cyan-200 hover:underline" href="https://lwn.net/ml/linux-fsdevel/20181107063127.3902-1-david@fromorbit.com/">Block size &gt; PAGE_SIZE attempt</a></td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">Stalled</td></tr>
+<tr class="border-b border-gray-800"><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">2023-03</td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">Dave Chinner</td><td class="py-2 px-3 text-gray-300 align-top"><a class="text-cyan-400 hover:text-cyan-200 hover:underline" href="https://lore.kernel.org/all/20230308075952.GU2825702@dread.disaster.area/T/#u">LBS design guidance to Pankaj Raghav</a></td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">Inflection point</td></tr>
+<tr class="border-b border-gray-800"><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">2023-09</td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">Pankaj Raghav et al</td><td class="py-2 px-3 text-gray-300 align-top"><a class="text-cyan-400 hover:text-cyan-200 hover:underline" href="https://lore.kernel.org/all/20230915183848.1018717-1-kernel@pankajraghav.com/">Enable block size &gt; page size in XFS</a></td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">Landed</td></tr>
+<tr class="border-b border-gray-800"><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">2024-09</td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">Pankaj Raghav</td><td class="py-2 px-3 text-gray-300 align-top"><a class="text-cyan-400 hover:text-cyan-200 hover:underline" href="https://lore.kernel.org/linux-xfs/?q=7df7c204c678">XFS LBS merged</a> &mdash; <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">7df7c204c678</code></td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">v6.12</td></tr>
+<tr class="border-b border-gray-800"><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">2024-11</td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">Luis Chamberlain</td><td class="py-2 px-3 text-gray-300 align-top"><a class="text-cyan-400 hover:text-cyan-200 hover:underline" href="https://lore.kernel.org/all/20241113094727.1497722-1-mcgrof@kernel.org/T/#mdea8649dd7254d1237d358c53dff17b02a60bf33">Large sector sizes via the bdev cache</a></td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">RFC</td></tr>
+<tr class="border-b border-gray-800"><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">2025-02</td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">Luis Chamberlain</td><td class="py-2 px-3 text-gray-300 align-top"><a class="text-cyan-400 hover:text-cyan-200 hover:underline" href="https://lore.kernel.org/linux-fsdevel/?q=block%2Fbdev+lift+block+size+restrictions+to+64k">Enable bs &gt; ps for block devices</a> &mdash; <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">47dd67532303</code> and friends</td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">v6.15</td></tr>
+<tr class="border-b border-gray-800"><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">2025-03</td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">Luis Chamberlain</td><td class="py-2 px-3 text-gray-300 align-top"><code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">FS_LBS</code> flag gate added to <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">include/linux/fs.h</code> &mdash; <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">a64e5a596067</code></td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">v6.15</td></tr>
+<tr class="border-b border-gray-800"><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">2025-09</td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">Qu Wenruo</td><td class="py-2 px-3 text-gray-300 align-top"><code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">98077f7f2180</code> &mdash; btrfs experimental bs &gt; ps</td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">v6.18</td></tr>
+<tr class="border-b border-gray-800"><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">2025-11</td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">Luis Chamberlain</td><td class="py-2 px-3 text-gray-300 align-top"><code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">cab8cbcb923a</code> &mdash; block sizes &gt; PAGE_SIZE on ext4</td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">v6.19</td></tr>
+<tr class="border-b border-gray-800"><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">2026-01</td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">XFS</td><td class="py-2 px-3 text-gray-300 align-top"><code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">4d6d335ea955</code> &mdash; LBS promoted from experimental together with metadirectory</td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">v7.0</td></tr>
+</tbody>
+</table>
+</div>
 
 Eighteen years and three months of wall-clock between Lameter's first
 mailing-list posting and XFS LBS shipping as a non-experimental,
@@ -123,6 +130,51 @@ buffered I/O through `buffer_head`, and the block device cache itself
 uses `buffer_head` for the partition-table read, the superblock probe,
 and a thousand small things. Without LBS on the bdev cache, no
 `buffer_head`-based filesystem could ever see a >PAGE_SIZE block.
+
+### What this phase was really for
+
+The phrasing "LBS on the bdev cache" undersells what this work was
+about. The end goal is **larger filesystem logical sector sizes** —
+allowing a filesystem to expose, and the block layer to honor, a
+sector that is the actual unit of failure on modern storage. Modern
+NVMe drives are not 512-byte or 4 KiB devices internally. They are
+16 KiB, 32 KiB, or larger indirection-unit (IU) devices, and the gap
+between the LBA the host writes at and the indirection unit the drive
+must rewrite is where write amplification, latency tails, and
+QLC-flash wear come from. The drive can paper over the gap with its
+own RMW, at a cost. Letting the filesystem speak in the drive's
+native unit is how you stop paying that cost.
+
+Larger sector sizes only become safe to use, however, when the
+underlying device can guarantee that a sector-sized write either
+completes in full or not at all — a *large atomic write*. The NVMe
+spec exposes this via per-namespace fields:
+
+- **NAWUPF** (Namespace Atomic Write Unit Power Fail): the largest
+  write the namespace will complete atomically across a power loss,
+  in logical block units.
+- **NPWG** (Namespace Preferred Write Granularity): the namespace's
+  preferred write size — for an IU-based drive, this is the
+  indirection unit.
+
+The relationship that matters for LBS is **NAWUPF ≥ NPWG**: the
+drive will atomically write a unit at least as large as its preferred
+granularity. When that holds, the host can use a filesystem block of
+NPWG bytes without ever exposing a torn write to userspace. Modern
+NVMe drives with large IUs (typical on enterprise QLC parts) ship
+with exactly this relationship; the host side just had to be ready
+to accept it.
+
+That readiness is what this v6.15 series provides. Phase 1 (XFS LBS
+in v6.12) proved LBS could land on a filesystem that did not use
+`buffer_head`. Phase 2 extends the same capability to every
+filesystem that does, by teaching the bdev cache, `fs/buffer.c`, and
+`fs/mpage.c` to work with large folios sized to a >PAGE_SIZE logical
+block. ext4's later LBS adoption (v6.19) is the visible payoff; the
+broader payoff is that any future filesystem feature whose unit is
+"a drive-native sector" — atomic writes proper, untorn
+metadata journaling, asymmetric-replication formats — gets to assume
+the substrate works.
 
 The "Enable bs > ps for block devices" series authored by Luis
 Chamberlain (with review from Hannes Reinecke, Christian Brauner,

@@ -92,108 +92,31 @@ mailing-list and LSFMM discussions that pulled the design back into the
 ditch and out of it again, and the eventual landing across XFS, the
 block-device cache, ext4, and btrfs.</p>
 <h2 id="timeline-of-attempts" class="text-2xl font-bold mt-12 mb-4 pb-2 border-b border-gray-700 text-gray-100">Timeline of attempts</h2>
-<table class="w-full text-sm border-collapse mb-6">
-<thead class="border-b border-gray-700 text-gray-400">
-<tr class="border-b border-gray-800">
-<th class="text-left py-2 px-3 font-medium">Year</th>
-<th class="text-left py-2 px-3 font-medium">Author</th>
-<th class="text-left py-2 px-3 font-medium">Posting / venue</th>
-<th class="text-left py-2 px-3 font-medium">Outcome</th>
-</tr>
+<div class="overflow-x-auto -mx-2">
+<table class="w-full text-sm border-collapse mb-6 w-full text-sm border-collapse mb-6" class="w-full text-sm border-collapse mb-6">
+<thead class="border-b border-gray-700 text-gray-400 border-b border-gray-700 text-gray-400" class="border-b border-gray-700 text-gray-400">
+<tr class="border-b border-gray-800"><th class="text-left py-2 px-3 font-medium text-left py-2 px-3 font-medium whitespace-nowrap" class="text-left py-2 px-3 font-medium">Year</th><th class="text-left py-2 px-3 font-medium text-left py-2 px-3 font-medium whitespace-nowrap" class="text-left py-2 px-3 font-medium">Author</th><th class="text-left py-2 px-3 font-medium text-left py-2 px-3 font-medium" class="text-left py-2 px-3 font-medium">Posting / venue</th><th class="text-left py-2 px-3 font-medium text-left py-2 px-3 font-medium whitespace-nowrap" class="text-left py-2 px-3 font-medium">Outcome</th></tr>
 </thead>
 <tbody>
-<tr class="border-b border-gray-800">
-<td class="py-2 px-3 text-gray-300 align-top">2007-05</td>
-<td class="py-2 px-3 text-gray-300 align-top">Christoph Lameter</td>
-<td class="py-2 px-3 text-gray-300 align-top"><a href="https://lwn.net/Articles/232757/" class="text-cyan-400 hover:text-cyan-200 hover:underline">Variable Order Page Cache</a> — compound pages in the page cache</td>
-<td class="py-2 px-3 text-gray-300 align-top">Stalled</td>
-</tr>
-<tr class="border-b border-gray-800">
-<td class="py-2 px-3 text-gray-300 align-top">2007-07</td>
-<td class="py-2 px-3 text-gray-300 align-top">Nick Piggin</td>
-<td class="py-2 px-3 text-gray-300 align-top"><a href="https://lwn.net/Articles/239621/" class="text-cyan-400 hover:text-cyan-200 hover:underline">fsblock</a> — replace <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">buffer_head</code> to support larger blocks</td>
-<td class="py-2 px-3 text-gray-300 align-top">Stalled</td>
-</tr>
-<tr class="border-b border-gray-800">
-<td class="py-2 px-3 text-gray-300 align-top">2009-03</td>
-<td class="py-2 px-3 text-gray-300 align-top">Nick Piggin</td>
-<td class="py-2 px-3 text-gray-300 align-top"><a href="https://lwn.net/Articles/321390/" class="text-cyan-400 hover:text-cyan-200 hover:underline">Updated fsblock patches</a></td>
-<td class="py-2 px-3 text-gray-300 align-top">Did not land</td>
-</tr>
-<tr class="border-b border-gray-800">
-<td class="py-2 px-3 text-gray-300 align-top">2014-01</td>
-<td class="py-2 px-3 text-gray-300 align-top">Dave Chinner</td>
-<td class="py-2 px-3 text-gray-300 align-top"><a href="https://lore.kernel.org/linux-mm/20140123082121.GN13997@dastard/" class="text-cyan-400 hover:text-cyan-200 hover:underline">Why prior LBS efforts failed and what to try instead</a></td>
-<td class="py-2 px-3 text-gray-300 align-top">Design analysis</td>
-</tr>
-<tr class="border-b border-gray-800">
-<td class="py-2 px-3 text-gray-300 align-top">2017-03</td>
-<td class="py-2 px-3 text-gray-300 align-top">LSFMM 2017</td>
-<td class="py-2 px-3 text-gray-300 align-top"><a href="https://lwn.net/Articles/717953/" class="text-cyan-400 hover:text-cyan-200 hover:underline">Page-cache larger than PAGE_SIZE</a> — group discussion</td>
-<td class="py-2 px-3 text-gray-300 align-top">Inconclusive</td>
-</tr>
-<tr class="border-b border-gray-800">
-<td class="py-2 px-3 text-gray-300 align-top">2018-11</td>
-<td class="py-2 px-3 text-gray-300 align-top">Dave Chinner</td>
-<td class="py-2 px-3 text-gray-300 align-top"><a href="https://lwn.net/ml/linux-fsdevel/20181107063127.3902-1-david@fromorbit.com/" class="text-cyan-400 hover:text-cyan-200 hover:underline">Block size &gt; PAGE_SIZE attempt</a></td>
-<td class="py-2 px-3 text-gray-300 align-top">Stalled</td>
-</tr>
-<tr class="border-b border-gray-800">
-<td class="py-2 px-3 text-gray-300 align-top">2023-03</td>
-<td class="py-2 px-3 text-gray-300 align-top">Dave Chinner</td>
-<td class="py-2 px-3 text-gray-300 align-top"><a href="https://lore.kernel.org/all/20230308075952.GU2825702@dread.disaster.area/T/#u" class="text-cyan-400 hover:text-cyan-200 hover:underline">LBS design guidance to Pankaj Raghav</a></td>
-<td class="py-2 px-3 text-gray-300 align-top">Inflection point</td>
-</tr>
-<tr class="border-b border-gray-800">
-<td class="py-2 px-3 text-gray-300 align-top">2023-09</td>
-<td class="py-2 px-3 text-gray-300 align-top">Pankaj Raghav et al</td>
-<td class="py-2 px-3 text-gray-300 align-top"><a href="https://lore.kernel.org/all/20230915183848.1018717-1-kernel@pankajraghav.com/" class="text-cyan-400 hover:text-cyan-200 hover:underline">Enable block size &gt; page size in XFS</a></td>
-<td class="py-2 px-3 text-gray-300 align-top">Landed</td>
-</tr>
-<tr class="border-b border-gray-800">
-<td class="py-2 px-3 text-gray-300 align-top">2024-09</td>
-<td class="py-2 px-3 text-gray-300 align-top">Pankaj Raghav</td>
-<td class="py-2 px-3 text-gray-300 align-top"><a href="https://lore.kernel.org/linux-xfs/?q=7df7c204c678" class="text-cyan-400 hover:text-cyan-200 hover:underline">XFS LBS merged</a> — <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">7df7c204c678</code></td>
-<td class="py-2 px-3 text-gray-300 align-top">v6.12</td>
-</tr>
-<tr class="border-b border-gray-800">
-<td class="py-2 px-3 text-gray-300 align-top">2024-11</td>
-<td class="py-2 px-3 text-gray-300 align-top">Luis Chamberlain</td>
-<td class="py-2 px-3 text-gray-300 align-top"><a href="https://lore.kernel.org/all/20241113094727.1497722-1-mcgrof@kernel.org/T/#mdea8649dd7254d1237d358c53dff17b02a60bf33" class="text-cyan-400 hover:text-cyan-200 hover:underline">Large sector sizes via the bdev cache</a></td>
-<td class="py-2 px-3 text-gray-300 align-top">RFC</td>
-</tr>
-<tr class="border-b border-gray-800">
-<td class="py-2 px-3 text-gray-300 align-top">2025-02</td>
-<td class="py-2 px-3 text-gray-300 align-top">Luis Chamberlain</td>
-<td class="py-2 px-3 text-gray-300 align-top"><a href="https://lore.kernel.org/linux-fsdevel/?q=block%2Fbdev+lift+block+size+restrictions+to+64k" class="text-cyan-400 hover:text-cyan-200 hover:underline">Enable bs &gt; ps for block devices</a> — <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">47dd67532303</code> and friends</td>
-<td class="py-2 px-3 text-gray-300 align-top">v6.15</td>
-</tr>
-<tr class="border-b border-gray-800">
-<td class="py-2 px-3 text-gray-300 align-top">2025-03</td>
-<td class="py-2 px-3 text-gray-300 align-top">Luis Chamberlain</td>
-<td class="py-2 px-3 text-gray-300 align-top"><code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">FS_LBS</code> flag gate added to <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">include/linux/fs.h</code> — <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">a64e5a596067</code></td>
-<td class="py-2 px-3 text-gray-300 align-top">v6.15</td>
-</tr>
-<tr class="border-b border-gray-800">
-<td class="py-2 px-3 text-gray-300 align-top">2025-09</td>
-<td class="py-2 px-3 text-gray-300 align-top">btrfs LBS</td>
-<td class="py-2 px-3 text-gray-300 align-top"><code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">98077f7f2180</code> (Qu Wenruo) — experimental bs &gt; ps</td>
-<td class="py-2 px-3 text-gray-300 align-top">v6.18</td>
-</tr>
-<tr class="border-b border-gray-800">
-<td class="py-2 px-3 text-gray-300 align-top">2025-11</td>
-<td class="py-2 px-3 text-gray-300 align-top">ext4 LBS</td>
-<td class="py-2 px-3 text-gray-300 align-top"><code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">cab8cbcb923a</code> (Luis Chamberlain) — block sizes &gt; PAGE_SIZE on ext4</td>
-<td class="py-2 px-3 text-gray-300 align-top">v6.19</td>
-</tr>
-<tr class="border-b border-gray-800">
-<td class="py-2 px-3 text-gray-300 align-top">2026-01</td>
-<td class="py-2 px-3 text-gray-300 align-top">XFS</td>
-<td class="py-2 px-3 text-gray-300 align-top"><code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">4d6d335ea955</code> — LBS promoted from experimental together with metadirectory</td>
-<td class="py-2 px-3 text-gray-300 align-top">v7.0</td>
-</tr>
+<tr class="border-b border-gray-800 border-b border-gray-800" class="border-b border-gray-800"><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">2007-05</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">Christoph Lameter</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top" class="py-2 px-3 text-gray-300 align-top"><a class="text-cyan-400 hover:text-cyan-200 hover:underline text-cyan-400 hover:text-cyan-200 hover:underline" href="https://lwn.net/Articles/232757/" class="text-cyan-400 hover:text-cyan-200 hover:underline">Variable Order Page Cache</a> &mdash; compound pages in the page cache</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">Stalled</td></tr>
+<tr class="border-b border-gray-800 border-b border-gray-800" class="border-b border-gray-800"><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">2007-07</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">Nick Piggin</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top" class="py-2 px-3 text-gray-300 align-top"><a class="text-cyan-400 hover:text-cyan-200 hover:underline text-cyan-400 hover:text-cyan-200 hover:underline" href="https://lwn.net/Articles/239621/" class="text-cyan-400 hover:text-cyan-200 hover:underline">fsblock</a> &mdash; replace <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm" class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">buffer_head</code> to support larger blocks</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">Stalled</td></tr>
+<tr class="border-b border-gray-800 border-b border-gray-800" class="border-b border-gray-800"><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">2009-03</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">Nick Piggin</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top" class="py-2 px-3 text-gray-300 align-top"><a class="text-cyan-400 hover:text-cyan-200 hover:underline text-cyan-400 hover:text-cyan-200 hover:underline" href="https://lwn.net/Articles/321390/" class="text-cyan-400 hover:text-cyan-200 hover:underline">Updated fsblock patches</a></td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">Did not land</td></tr>
+<tr class="border-b border-gray-800 border-b border-gray-800" class="border-b border-gray-800"><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">2014-01</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">Dave Chinner</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top" class="py-2 px-3 text-gray-300 align-top"><a class="text-cyan-400 hover:text-cyan-200 hover:underline text-cyan-400 hover:text-cyan-200 hover:underline" href="https://lore.kernel.org/linux-mm/20140123082121.GN13997@dastard/" class="text-cyan-400 hover:text-cyan-200 hover:underline">Why prior LBS efforts failed and what to try instead</a></td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">Design analysis</td></tr>
+<tr class="border-b border-gray-800 border-b border-gray-800" class="border-b border-gray-800"><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">2017-03</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">LSFMM 2017</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top" class="py-2 px-3 text-gray-300 align-top"><a class="text-cyan-400 hover:text-cyan-200 hover:underline text-cyan-400 hover:text-cyan-200 hover:underline" href="https://lwn.net/Articles/717953/" class="text-cyan-400 hover:text-cyan-200 hover:underline">Page-cache larger than PAGE_SIZE</a> &mdash; group discussion</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">Inconclusive</td></tr>
+<tr class="border-b border-gray-800 border-b border-gray-800" class="border-b border-gray-800"><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">2018-11</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">Dave Chinner</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top" class="py-2 px-3 text-gray-300 align-top"><a class="text-cyan-400 hover:text-cyan-200 hover:underline text-cyan-400 hover:text-cyan-200 hover:underline" href="https://lwn.net/ml/linux-fsdevel/20181107063127.3902-1-david@fromorbit.com/" class="text-cyan-400 hover:text-cyan-200 hover:underline">Block size &gt; PAGE_SIZE attempt</a></td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">Stalled</td></tr>
+<tr class="border-b border-gray-800 border-b border-gray-800" class="border-b border-gray-800"><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">2023-03</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">Dave Chinner</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top" class="py-2 px-3 text-gray-300 align-top"><a class="text-cyan-400 hover:text-cyan-200 hover:underline text-cyan-400 hover:text-cyan-200 hover:underline" href="https://lore.kernel.org/all/20230308075952.GU2825702@dread.disaster.area/T/#u" class="text-cyan-400 hover:text-cyan-200 hover:underline">LBS design guidance to Pankaj Raghav</a></td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">Inflection point</td></tr>
+<tr class="border-b border-gray-800 border-b border-gray-800" class="border-b border-gray-800"><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">2023-09</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">Pankaj Raghav et al</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top" class="py-2 px-3 text-gray-300 align-top"><a class="text-cyan-400 hover:text-cyan-200 hover:underline text-cyan-400 hover:text-cyan-200 hover:underline" href="https://lore.kernel.org/all/20230915183848.1018717-1-kernel@pankajraghav.com/" class="text-cyan-400 hover:text-cyan-200 hover:underline">Enable block size &gt; page size in XFS</a></td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">Landed</td></tr>
+<tr class="border-b border-gray-800 border-b border-gray-800" class="border-b border-gray-800"><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">2024-09</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">Pankaj Raghav</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top" class="py-2 px-3 text-gray-300 align-top"><a class="text-cyan-400 hover:text-cyan-200 hover:underline text-cyan-400 hover:text-cyan-200 hover:underline" href="https://lore.kernel.org/linux-xfs/?q=7df7c204c678" class="text-cyan-400 hover:text-cyan-200 hover:underline">XFS LBS merged</a> &mdash; <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm" class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">7df7c204c678</code></td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">v6.12</td></tr>
+<tr class="border-b border-gray-800 border-b border-gray-800" class="border-b border-gray-800"><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">2024-11</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">Luis Chamberlain</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top" class="py-2 px-3 text-gray-300 align-top"><a class="text-cyan-400 hover:text-cyan-200 hover:underline text-cyan-400 hover:text-cyan-200 hover:underline" href="https://lore.kernel.org/all/20241113094727.1497722-1-mcgrof@kernel.org/T/#mdea8649dd7254d1237d358c53dff17b02a60bf33" class="text-cyan-400 hover:text-cyan-200 hover:underline">Large sector sizes via the bdev cache</a></td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">RFC</td></tr>
+<tr class="border-b border-gray-800 border-b border-gray-800" class="border-b border-gray-800"><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">2025-02</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">Luis Chamberlain</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top" class="py-2 px-3 text-gray-300 align-top"><a class="text-cyan-400 hover:text-cyan-200 hover:underline text-cyan-400 hover:text-cyan-200 hover:underline" href="https://lore.kernel.org/linux-fsdevel/?q=block%2Fbdev+lift+block+size+restrictions+to+64k" class="text-cyan-400 hover:text-cyan-200 hover:underline">Enable bs &gt; ps for block devices</a> &mdash; <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm" class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">47dd67532303</code> and friends</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">v6.15</td></tr>
+<tr class="border-b border-gray-800 border-b border-gray-800" class="border-b border-gray-800"><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">2025-03</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">Luis Chamberlain</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top" class="py-2 px-3 text-gray-300 align-top"><code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm" class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">FS_LBS</code> flag gate added to <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm" class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">include/linux/fs.h</code> &mdash; <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm" class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">a64e5a596067</code></td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">v6.15</td></tr>
+<tr class="border-b border-gray-800 border-b border-gray-800" class="border-b border-gray-800"><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">2025-09</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">Qu Wenruo</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top" class="py-2 px-3 text-gray-300 align-top"><code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm" class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">98077f7f2180</code> &mdash; btrfs experimental bs &gt; ps</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">v6.18</td></tr>
+<tr class="border-b border-gray-800 border-b border-gray-800" class="border-b border-gray-800"><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">2025-11</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">Luis Chamberlain</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top" class="py-2 px-3 text-gray-300 align-top"><code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm" class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">cab8cbcb923a</code> &mdash; block sizes &gt; PAGE_SIZE on ext4</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">v6.19</td></tr>
+<tr class="border-b border-gray-800 border-b border-gray-800" class="border-b border-gray-800"><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">2026-01</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">XFS</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top" class="py-2 px-3 text-gray-300 align-top"><code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm" class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">4d6d335ea955</code> &mdash; LBS promoted from experimental together with metadirectory</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">v7.0</td></tr>
 </tbody>
 </table>
+</div>
+
 <p class="text-gray-300 leading-relaxed mb-4">Eighteen years and three months of wall-clock between Lameter's first
 mailing-list posting and XFS LBS shipping as a non-experimental,
 default-buildable feature.</p>
@@ -247,6 +170,47 @@ buffered I/O through <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-30
 uses <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">buffer_head</code> for the partition-table read, the superblock probe,
 and a thousand small things. Without LBS on the bdev cache, no
 <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">buffer_head</code>-based filesystem could ever see a &gt;PAGE_SIZE block.</p>
+<h3 id="what-this-phase-was-really-for" class="text-xl font-semibold mt-8 mb-3 text-cyan-300">What this phase was really for</h3>
+<p class="text-gray-300 leading-relaxed mb-4">The phrasing "LBS on the bdev cache" undersells what this work was
+about. The end goal is <strong class="font-semibold text-gray-100">larger filesystem logical sector sizes</strong> —
+allowing a filesystem to expose, and the block layer to honor, a
+sector that is the actual unit of failure on modern storage. Modern
+NVMe drives are not 512-byte or 4 KiB devices internally. They are
+16 KiB, 32 KiB, or larger indirection-unit (IU) devices, and the gap
+between the LBA the host writes at and the indirection unit the drive
+must rewrite is where write amplification, latency tails, and
+QLC-flash wear come from. The drive can paper over the gap with its
+own RMW, at a cost. Letting the filesystem speak in the drive's
+native unit is how you stop paying that cost.</p>
+<p class="text-gray-300 leading-relaxed mb-4">Larger sector sizes only become safe to use, however, when the
+underlying device can guarantee that a sector-sized write either
+completes in full or not at all — a <em class="italic text-gray-200">large atomic write</em>. The NVMe
+spec exposes this via per-namespace fields:</p>
+<ul class="list-disc ml-6 space-y-1 mb-4 text-gray-300">
+<li class="leading-relaxed"><strong class="font-semibold text-gray-100">NAWUPF</strong> (Namespace Atomic Write Unit Power Fail): the largest
+  write the namespace will complete atomically across a power loss,
+  in logical block units.</li>
+<li class="leading-relaxed"><strong class="font-semibold text-gray-100">NPWG</strong> (Namespace Preferred Write Granularity): the namespace's
+  preferred write size — for an IU-based drive, this is the
+  indirection unit.</li>
+</ul>
+<p class="text-gray-300 leading-relaxed mb-4">The relationship that matters for LBS is <strong class="font-semibold text-gray-100">NAWUPF ≥ NPWG</strong>: the
+drive will atomically write a unit at least as large as its preferred
+granularity. When that holds, the host can use a filesystem block of
+NPWG bytes without ever exposing a torn write to userspace. Modern
+NVMe drives with large IUs (typical on enterprise QLC parts) ship
+with exactly this relationship; the host side just had to be ready
+to accept it.</p>
+<p class="text-gray-300 leading-relaxed mb-4">That readiness is what this v6.15 series provides. Phase 1 (XFS LBS
+in v6.12) proved LBS could land on a filesystem that did not use
+<code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">buffer_head</code>. Phase 2 extends the same capability to every
+filesystem that does, by teaching the bdev cache, <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">fs/buffer.c</code>, and
+<code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">fs/mpage.c</code> to work with large folios sized to a &gt;PAGE_SIZE logical
+block. ext4's later LBS adoption (v6.19) is the visible payoff; the
+broader payoff is that any future filesystem feature whose unit is
+"a drive-native sector" — atomic writes proper, untorn
+metadata journaling, asymmetric-replication formats — gets to assume
+the substrate works.</p>
 <p class="text-gray-300 leading-relaxed mb-4">The "Enable bs &gt; ps for block devices" series authored by Luis
 Chamberlain (with review from Hannes Reinecke, Christian Brauner,
 Christoph Hellwig, and Pankaj Raghav) closed that gap in v6.15:</p>
