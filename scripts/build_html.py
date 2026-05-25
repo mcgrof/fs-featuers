@@ -258,49 +258,10 @@ def render(features: list[dict], analysis: dict) -> str:
         ]
     )
 
-    # LBS biography panel
-    lbs_panels = []
-    for fs in ("xfs", "btrfs", "ext4"):
-        info = analysis["lbs"]["by_fs"].get(fs)
-        if not info:
-            continue
-        lbs_panels.append(
-            f"""
-        <div class="card rounded-lg p-5 border-l-4 {FS_BORDER[fs]}">
-          <h3 class="font-semibold {FS_HEADING[fs]} mb-2">{fs.upper()} LBS</h3>
-          <p class="text-gray-400 text-xs mb-2">
-            RFC <span class="font-mono text-gray-300">{safe(info.get("rfc_date"))}</span>
-            -> merged <span class="font-mono text-gray-300">{safe(info.get("merged_date"))}</span>
-            ({safe(info.get("merged_version"))})
-          </p>
-          <div class="grid grid-cols-2 gap-2 text-sm">
-            <div>
-              <div class="text-xs text-gray-500">RFC -> merge</div>
-              <div class="font-mono text-emerald-300 text-xl">
-                {info.get("rfc_to_merge_years")}y
-              </div>
-            </div>
-            <div>
-              <div class="text-xs text-gray-500">first idea -> merge</div>
-              <div class="font-mono text-amber-300 text-xl">
-                {info.get("first_idea_to_merge_years")}y
-              </div>
-            </div>
-          </div>
-        </div>
-        """
-        )
-    lbs_panels_html = "\n".join(lbs_panels)
-
-    lag_rows = []
-    for fs, info in analysis["lbs"]["ext_btrfs_lag_vs_xfs"].items():
-        lag_rows.append(
-            f'<li><strong>{fs.upper()} LBS</strong> merged '
-            f'<span class="font-mono">{safe(info["merged_date"])}</span>, '
-            f'<span class="text-amber-300">{info["lag_years_after_xfs_lbs"]}y</span> '
-            'after XFS LBS</li>'
-        )
-    lag_html = "\n".join(lag_rows)
+    # LBS per-fs panel + lag list moved to the LBS case study page; the
+    # main report keeps only a short pointer (see the <section id="lbs">
+    # block below). The numbers all live in analysis.json for anyone who
+    # wants to render them elsewhere.
 
     totals = analysis["totals"]
     rfc_all = analysis["rfc_to_merge_all"]
@@ -445,56 +406,42 @@ def render(features: list[dict], analysis: dict) -> str:
     </section>
 
     <section class="mb-14" id="lbs">
-      <div class="camp-header">
-        <h2 class="text-2xl font-bold">LBS biography</h2>
-        <p class="text-gray-500 text-sm mt-1">
-          Large Block Sizes is the only feature in the catalog with a multi-RFC
-          arc spanning a decade and a half. The chart records every attempt,
-          succeeded or not.
-        </p>
-      </div>
-
-      <div class="figure mb-6">
-        <img src="images/lbs_biography.png" alt="LBS biography timeline">
-      </div>
-
-      <div class="grid md:grid-cols-3 gap-4 mb-6">
-        {lbs_panels_html}
-      </div>
-
-      <div class="card rounded-xl p-6">
-        <h3 class="font-semibold text-lg mb-3">After XFS, the runway opened</h3>
-        <p class="text-gray-300 text-sm mb-3">
-          The mm and iomap large-folio infrastructure that LBS-on-XFS forced into
-          existence was reused by ext4 and btrfs at much lower cost. Both
-          followed inside thirteen months:
-        </p>
-        <ul class="text-gray-400 text-sm space-y-1 ml-4 list-disc">
-          {lag_html}
-        </ul>
-      </div>
-
-      <div class="figure mt-6">
-        <img src="images/lbs_per_fs.png" alt="LBS adoption per fs">
-      </div>
-
-      <div class="mt-6 card rounded-xl p-6 border-l-4 border-cyan-500">
-        <div class="flex items-start justify-between">
-          <div>
-            <h3 class="font-semibold text-lg mb-2 text-cyan-300">
-              Full LBS case study
-            </h3>
+      <div class="card rounded-xl p-6 border-l-4 border-cyan-500">
+        <div class="md:flex md:items-start md:justify-between">
+          <div class="md:max-w-3xl">
+            <p class="text-xs uppercase tracking-wide text-cyan-400 mb-2">
+              Featured case study
+            </p>
+            <h2 class="text-2xl font-bold mb-3 text-gray-100">LBS biography</h2>
+            <p class="text-gray-300 text-sm mb-3">
+              LBS is the only feature in the catalog with a multi-RFC arc
+              spanning a decade and a half: Christoph Lameter's 2007
+              compound-page RFC, Nick Piggin's fsblock, the 2014 and 2018
+              Chinner attempts, the 2017 LSFMM revisit, Dave Chinner's
+              2023 design guidance to Pankaj Raghav, the XFS series that
+              landed in v6.12, the v6.15 block-device cache LBS work that
+              unlocked buffer-head-based filesystems, and the ext4 and
+              btrfs follow-ons in 2025. The long-form biography with
+              every commit, every stalled attempt, every reference, and
+              the three per-phase timeline figures lives in the case
+              study.
+            </p>
             <p class="text-gray-300 text-sm">
-              A long-form biography of LBS in three phases: Lameter 2007 ->
-              Piggin fsblock -> Chinner 2014/2018 -> Raghav 2023, then the
-              v6.15 block-device cache work that unlocked ext4, then ext4
-              and btrfs in 2025. Every commit, every stalled attempt, every
-              reference.
+              The headline numbers stay here because they belong with the
+              summary table:
+              first-idea-to-merge
+              <span class="font-mono text-rose-300">17.31y</span>
+              (longest in the catalog), RFC-to-merge
+              <span class="font-mono text-emerald-300">0.97y</span>
+              (in line with the catalog mean), merge-to-enterprise
+              <span class="font-mono text-cyan-300">0.71y</span>
+              (the fastest of any feature). The full story is one page
+              over.
             </p>
           </div>
           <a href="case_studies/lbs.html"
-             class="ml-4 px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg font-medium text-sm whitespace-nowrap">
-            read &rarr;
+             class="mt-4 md:mt-0 md:ml-6 inline-block px-5 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg font-medium text-sm whitespace-nowrap">
+            read the case study &rarr;
           </a>
         </div>
       </div>

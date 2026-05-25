@@ -33,8 +33,8 @@ analyze: $(DATA)/analysis.json
 $(DATA)/analysis.json: $(FEATURE_JSONS) $(SCRIPTS)/analyze.py
 	$(PYTHON) $(SCRIPTS)/analyze.py
 
-plots: $(DOCS)/images/timeline.png
-$(DOCS)/images/timeline.png: $(FEATURE_JSONS) $(SCRIPTS)/plot.py
+plots: $(DOCS)/images/timeline.png $(DOCS)/case_studies/images/lbs_biography.png
+$(DOCS)/images/timeline.png $(DOCS)/case_studies/images/lbs_biography.png &: $(FEATURE_JSONS) $(SCRIPTS)/plot.py
 	$(PYTHON) $(SCRIPTS)/plot.py
 
 report: $(DOCS)/index.html $(DOCS)/findings.html
