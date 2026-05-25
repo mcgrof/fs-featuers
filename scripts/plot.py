@@ -304,10 +304,18 @@ def plot_merge_to_enterprise(features):
 
 
 def plot_lbs_biography(features):
-    """Timeline showing LBS's 17-year arc of attempts."""
+    """Timeline showing LBS's 17-year arc of attempts.
+
+    Layout strategy: every event sits on the time axis as a colored marker,
+    and labels stack into discrete y-lanes alternating above/below the
+    baseline. A label whose horizontal extent would overlap the previous
+    label on the same side gets pushed to the next lane out. This is
+    cheaper and more predictable than the prior heuristic and reads
+    cleanly even when events are months apart.
+    """
     fig, ax = fig_setup(
-        figsize=(14, 5),
-        title="LBS biography: 17 years of attempts, finally merged in 2024",
+        figsize=(15, 6.5),
+        title="LBS biography: from Lameter 2007 to LBS-everywhere 2026",
     )
 
     lbs_xfs = next(
@@ -317,72 +325,89 @@ def plot_lbs_biography(features):
         return
 
     events = []
-    # historical_attempts already contains the first idea + every prior
-    # stalled RFC, so it is the canonical source for the pre-success arc.
     for h in lbs_xfs.get("historical_attempts", []):
         d = parse_date(h["date"])
         if not d:
             continue
         author = h["author"].split(",")[0]
-        # Compact two-line label for readability on a tight timeline
-        events.append(
-            (
-                d,
-                f"{author}\n{h.get('note', '')[:38]}".rstrip(),
-                "#fb923c",
-                h.get("note", "")[:60],
-            )
-        )
+        events.append((d, author, "#fb923c"))
     events.append(
-        (
-            parse_date(lbs_xfs["rfc_date"]),
-            "Pankaj Raghav et al:\nXFS LBS RFC",
-            "#fde047",
-            "the attempt that landed",
-        )
+        (parse_date(lbs_xfs["rfc_date"]), "Raghav: XFS LBS RFC", "#fde047")
     )
     events.append(
-        (
-            parse_date(lbs_xfs["merged_date"]),
-            "XFS LBS merged\n(v6.12)",
-            "#34d399",
-            "0.97 years from RFC",
-        )
+        (parse_date(lbs_xfs["merged_date"]), "XFS LBS merged v6.12", "#34d399")
     )
-    suse = parse_date(lbs_xfs.get("suse_first_date"))
     rhel = parse_date(lbs_xfs.get("rhel_first_date"))
     if rhel:
+        events.append((rhel, "RHEL 10 TP", "#22d3ee"))
+    # Phase 2 + 3 markers: the v6.15 bdev work and the ext4/btrfs landings
+    ext4 = next(
+        (f for f in features if f["short_name"] == "ext4_lbs"), None
+    )
+    btrfs = next(
+        (f for f in features if f["short_name"] == "btrfs_lbs"), None
+    )
+    if btrfs and btrfs.get("merged_date"):
         events.append(
-            (rhel, "RHEL 10\n(tech preview)", "#22d3ee", "0.71y from merge")
+            (
+                parse_date(btrfs["merged_date"]),
+                "btrfs LBS v6.18 (exp.)",
+                "#34d399",
+            )
+        )
+    if ext4 and ext4.get("merged_date"):
+        events.append(
+            (
+                parse_date(ext4["merged_date"]),
+                "ext4 LBS v6.19",
+                "#a78bfa",
+            )
         )
 
     events = [e for e in events if e[0]]
     events.sort(key=lambda e: e[0])
-    xs = [e[0] for e in events]
-    ys = [0.5] * len(events)
-    colors = [e[2] for e in events]
 
-    # baseline
-    ax.axhline(0.5, color=AXIS, linewidth=1, alpha=0.6, zorder=0)
-    ax.scatter(xs, ys, c=colors, s=200, zorder=2, edgecolors=TEXT, linewidth=1)
-    # alternating labels above/below, with extra offset when adjacent events
-    # are within 1 year of each other to avoid label collisions
-    last_year = None
-    sign = 1
-    for i, (d, label, color, sub) in enumerate(events):
-        year = d.year + d.month / 12
-        if last_year is not None and abs(year - last_year) < 1.5:
-            sign = -sign  # flip to opposite side
-            offset = 0.45 * sign
-        else:
-            offset = 0.22 * (1 if i % 2 == 0 else -1)
-            sign = 1 if offset > 0 else -1
-        last_year = year
-        va = "bottom" if offset > 0 else "top"
+    xs = [e[0] for e in events]
+    colors = [e[2] for e in events]
+    baseline_y = 0.0
+
+    # Baseline + markers
+    ax.axhline(baseline_y, color=AXIS, linewidth=1.5, alpha=0.7, zorder=0)
+    ax.scatter(
+        xs, [baseline_y] * len(events), c=colors, s=240, zorder=3,
+        edgecolors=TEXT, linewidth=1.2,
+    )
+
+    # Lane assignment: label per event gets a (sign, lane) where sign is
+    # +1 above or -1 below, and lane is 1..N distance from baseline.
+    # Lanes alternate sides as you walk left-to-right. Adjacent labels
+    # within MIN_DAYS get bumped to a further lane on the same side.
+    from datetime import timedelta
+
+    MIN_DAYS = 500  # below this gap we treat labels as colliding
+    lane_step = 0.32
+    # Track last x per (sign, lane) so we know if a new label collides
+    last_x: dict[tuple[int, int], object] = {}
+    placements = []
+    for i, (d, label, color) in enumerate(events):
+        sign = 1 if i % 2 == 0 else -1
+        lane = 1
+        while True:
+            prev_x = last_x.get((sign, lane))
+            if prev_x is None or (d - prev_x) >= timedelta(days=MIN_DAYS):
+                last_x[(sign, lane)] = d
+                placements.append((d, label, color, sign, lane))
+                break
+            lane += 1
+
+    # Render labels with a small leader line
+    for d, label, color, sign, lane in placements:
+        y = baseline_y + sign * (0.18 + lane_step * (lane - 1))
+        va = "bottom" if sign > 0 else "top"
         ax.annotate(
             f"{label}\n{d.isoformat()}",
-            xy=(d, 0.5),
-            xytext=(d, 0.5 + offset),
+            xy=(d, baseline_y),
+            xytext=(d, y),
             ha="center",
             va=va,
             color=TEXT,
@@ -391,7 +416,16 @@ def plot_lbs_biography(features):
             arrowprops=dict(arrowstyle="-", color=AXIS, lw=0.6),
         )
 
-    ax.set_ylim(-0.2, 1.2)
+    # Y-limits sized to the deepest lane used on either side
+    max_lane_up = max(
+        (lane for (_, _, _, sign, lane) in placements if sign > 0), default=0
+    )
+    max_lane_dn = max(
+        (lane for (_, _, _, sign, lane) in placements if sign < 0), default=0
+    )
+    top = 0.18 + lane_step * max_lane_up + 0.55
+    bot = -(0.18 + lane_step * max_lane_dn + 0.55)
+    ax.set_ylim(bot, top)
     ax.set_yticks([])
     ax.xaxis.set_major_locator(mdates.YearLocator(2))
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
@@ -399,6 +433,25 @@ def plot_lbs_biography(features):
     ax.spines["right"].set_visible(False)
     ax.spines["top"].set_visible(False)
     ax.set_xlabel("")
+
+    # Mini legend for the colors
+    legend_elements = [
+        Patch(facecolor="#fb923c", label="prior stalled attempt"),
+        Patch(facecolor="#fde047", label="RFC that landed"),
+        Patch(facecolor="#34d399", label="merged"),
+        Patch(facecolor="#a78bfa", label="ext4 follow-on"),
+        Patch(facecolor="#22d3ee", label="enterprise pickup"),
+    ]
+    leg = ax.legend(
+        handles=legend_elements,
+        loc="upper left",
+        facecolor=PANEL,
+        edgecolor=AXIS,
+        fontsize=8,
+        framealpha=0.85,
+    )
+    for t in leg.get_texts():
+        t.set_color(TEXT)
 
     save(fig, "lbs_biography.png")
 
