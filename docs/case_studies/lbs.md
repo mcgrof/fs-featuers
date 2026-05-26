@@ -244,6 +244,91 @@ landing, but the first-idea-to-merge wall-clock is the longest of any
 feature tracked, and the enterprise adoption pace is the fastest. The
 two extremes are the same story told from different ends.
 
+## Enterprise enablement of large sector sizes
+
+The XFS LBS row above records RHEL 10's pickup of XFS LBS in v6.12 — but
+that is only Phase 1 of the LBS arc landing in enterprise. The bigger
+payoff, **a filesystem using a logical sector size larger than
+`PAGE_SIZE` on top of a drive that natively wants larger sectors**, also
+requires Phase 2 (the v6.15 bdev cache and buffer-head LBS series) plus
+hardware that opts in. The XFS-LBS-in-RHEL-10 figure of 0.71 years
+understates how long it will take customers to actually run with larger
+filesystem sectors on enterprise Linux.
+
+A deployable large-sector-size configuration needs all five of:
+
+1. **Hardware**: an NVMe drive that reports `NAWUPF >= NPWG` so the
+   atomic write unit covers the device's preferred write granularity.
+   Typical on enterprise QLC with large (16 KiB / 32 KiB / 64 KiB)
+   indirection units; rare to absent on consumer drives.
+
+2. **Kernel**: v6.15 or later. v6.12 only delivers XFS LBS on the iomap
+   path; the bdev cache, partition probe, and superblock read still went
+   through `PAGE_SIZE`-bounded buffer heads. v6.15 lifts that, adds the
+   `FS_LBS` gating flag in `include/linux/fs.h`, and is the first
+   kernel where the full bs > ps stack works for any filesystem.
+
+3. **Filesystem**: an `FS_LBS`-flagged filesystem that has audited its
+   I/O path for >PAGE_SIZE blocks. As of v7.1: XFS (since v6.12),
+   bcachefs (since v6.15), btrfs (experimental since v6.18), ext4 (since
+   v6.19).
+
+4. **Userspace**: `mkfs` that accepts and validates a logical sector
+   size larger than `PAGE_SIZE`, plus monitoring that knows what to
+   watch for at the new size (write amplification, atomic-write counters,
+   per-namespace power-fail granularity).
+
+5. **Distribution support**: the vendor has run the test matrix for
+   their support scope, documented the customer guidance, and is willing
+   to take the support call when it goes wrong.
+
+Distribution status as of 2026-05-25:
+
+<div class="overflow-x-auto -mx-2">
+<table class="w-full text-sm border-collapse mb-6">
+<thead class="border-b border-gray-700 text-gray-400">
+<tr><th class="text-left py-2 px-3 font-medium whitespace-nowrap">Distribution</th><th class="text-left py-2 px-3 font-medium whitespace-nowrap">Released</th><th class="text-left py-2 px-3 font-medium whitespace-nowrap">Base kernel</th><th class="text-left py-2 px-3 font-medium whitespace-nowrap">XFS LBS (v6.12)</th><th class="text-left py-2 px-3 font-medium whitespace-nowrap">bdev-cache LBS (v6.15)</th><th class="text-left py-2 px-3 font-medium">Comment</th></tr>
+</thead>
+<tbody>
+<tr class="border-b border-gray-800"><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">RHEL 10.0</td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">2025-05</td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">6.12</td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">yes (TP)</td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">no</td><td class="py-2 px-3 text-gray-300 align-top">iomap path only; ships before the v6.15 cycle</td></tr>
+<tr class="border-b border-gray-800"><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">RHEL 10.1+</td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">TBD</td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">6.12 + backports</td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">yes</td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">likely (backport)</td><td class="py-2 px-3 text-gray-300 align-top">speculative; watch the release notes</td></tr>
+<tr class="border-b border-gray-800"><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">SLE 15 SP7</td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">2025-06</td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">6.4</td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">no</td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">no</td><td class="py-2 px-3 text-gray-300 align-top">kernel predates LBS upstream</td></tr>
+<tr class="border-b border-gray-800"><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">SUSE 16.0</td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">~2026-06</td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">TBD (≥ 6.12)</td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">likely</td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">backport-dependent</td><td class="py-2 px-3 text-gray-300 align-top">depends on whether the v6.15 bdev work is backported</td></tr>
+<tr class="border-b border-gray-800"><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">Ubuntu 24.04 LTS</td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">2024-04</td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">6.8</td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">no</td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">no</td><td class="py-2 px-3 text-gray-300 align-top">kernel predates LBS; HWE stream may close the gap</td></tr>
+<tr class="border-b border-gray-800"><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">Ubuntu 26.04 LTS</td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">~2026-04</td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">TBD (≥ 6.14 expected)</td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">likely</td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">likely</td><td class="py-2 px-3 text-gray-300 align-top">first LTS with a base kernel new enough to ship the full stack</td></tr>
+<tr class="border-b border-gray-800"><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">Azure Linux 3</td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">2024-10</td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">6.6</td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">no</td><td class="py-2 px-3 text-gray-300 align-top whitespace-nowrap">no</td><td class="py-2 px-3 text-gray-300 align-top">would need a kernel rebase to pick this up</td></tr>
+</tbody>
+</table>
+</div>
+
+(Status above is best-effort from public release notes and kernel
+package metadata; corrections via PR welcome. Unreleased rows are
+speculation framed against published distro roadmaps.)
+
+The realistic path from "XFS LBS upstream" (September 2024) to "large
+filesystem sectors as a documented supported configuration on enterprise
+Linux" is at least eighteen months and possibly longer. That puts the
+*real* merge-to-enterprise wall-clock for the LBS program closer to two
+years than the 0.71-year row the catalog shows for XFS LBS alone.
+
+Two implications worth pulling out:
+
+- The catalog's per-feature `merge_to_enterprise_years` field describes
+  the visible step (the vendor flips a flag), not the underlying
+  capability arriving in production fleets. For features whose value
+  depends on a multi-stage stack — XFS LBS, then bdev cache LBS, then
+  mkfs tooling, then validation — the catalog row can be a substantial
+  underestimate. Future case studies should call this out where it
+  applies; DAX is the obvious next example, with a much worse arc.
+
+- The hardware question is doing more work than the kernel question. An
+  enterprise QLC SSD with NAWUPF ≥ NPWG is the prerequisite that decides
+  whether a customer actually benefits, and adoption of that hardware in
+  the field is not what the kernel project tracks. The fs-features
+  catalog records a kernel feature shipping; the enterprise *value* of
+  LBS lives in a column we do not have yet, and that is the column most
+  worth filling in next.
+
 ## What this case study suggests about how Linux fs features mature
 
 Three patterns repeat across LBS that are worth watching for the next

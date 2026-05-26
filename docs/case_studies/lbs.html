@@ -49,7 +49,7 @@
     </nav>
 
     <article class="card rounded-xl p-8 md:p-12">
-      
+
     <header class="mb-10 pb-8 border-b border-gray-700">
       <p class="text-xs uppercase tracking-wide text-cyan-400 mb-2">
         Case study
@@ -67,7 +67,7 @@
             <span class="inline-flex items-center gap-1 bg-gray-800 text-gray-300 px-2 py-1 rounded text-xs"><span class="text-gray-500">updated</span><span class="font-semibold">2026-05-25</span></span>
       </div>
       <div class="mt-3 text-sm text-gray-400"><span class="text-gray-500">maintainers:</span> <span class="text-gray-300">Pankaj Raghav, Luis Chamberlain, Hannes Reinecke</span></div>
-      
+
         <div class="mt-6">
           <div class="text-xs uppercase tracking-wide text-gray-500 mb-2">
             authors / contributors
@@ -84,9 +84,9 @@
               <li class="text-sm text-gray-400">Qu Wenruo (btrfs LBS series)</li>
           </ul>
         </div>
-        
+
     </header>
-    
+
 <h1 id="large-block-sizes-lbs" class="text-4xl font-bold mb-2 text-gray-100">Large Block Sizes (LBS)</h1>
 <h2 id="what-and-why" class="text-2xl font-bold mt-12 mb-4 pb-2 border-b border-gray-700 text-gray-100">What and why</h2>
 <p class="text-gray-300 leading-relaxed mb-4">LBS lets a filesystem use a logical block size larger than the system's
@@ -326,6 +326,95 @@ broader pattern: the fs-level RFC pace looks ordinary on each LBS
 landing, but the first-idea-to-merge wall-clock is the longest of any
 feature tracked, and the enterprise adoption pace is the fastest. The
 two extremes are the same story told from different ends.</p>
+<h2 id="enterprise-enablement-of-large-sector-sizes" class="text-2xl font-bold mt-12 mb-4 pb-2 border-b border-gray-700 text-gray-100">Enterprise enablement of large sector sizes</h2>
+<p class="text-gray-300 leading-relaxed mb-4">The XFS LBS row above records RHEL 10's pickup of XFS LBS in v6.12 — but
+that is only Phase 1 of the LBS arc landing in enterprise. The bigger
+payoff, <strong class="font-semibold text-gray-100">a filesystem using a logical sector size larger than
+<code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">PAGE_SIZE</code> on top of a drive that natively wants larger sectors</strong>, also
+requires Phase 2 (the v6.15 bdev cache and buffer-head LBS series) plus
+hardware that opts in. The XFS-LBS-in-RHEL-10 figure of 0.71 years
+understates how long it will take customers to actually run with larger
+filesystem sectors on enterprise Linux.</p>
+<p class="text-gray-300 leading-relaxed mb-4">A deployable large-sector-size configuration needs all five of:</p>
+<ol class="list-decimal ml-6 space-y-1 mb-4 text-gray-300">
+<li class="leading-relaxed">
+<p class="text-gray-300 leading-relaxed mb-4"><strong class="font-semibold text-gray-100">Hardware</strong>: an NVMe drive that reports <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">NAWUPF &gt;= NPWG</code> so the
+   atomic write unit covers the device's preferred write granularity.
+   Typical on enterprise QLC with large (16 KiB / 32 KiB / 64 KiB)
+   indirection units; rare to absent on consumer drives.</p>
+</li>
+<li class="leading-relaxed">
+<p class="text-gray-300 leading-relaxed mb-4"><strong class="font-semibold text-gray-100">Kernel</strong>: v6.15 or later. v6.12 only delivers XFS LBS on the iomap
+   path; the bdev cache, partition probe, and superblock read still went
+   through <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">PAGE_SIZE</code>-bounded buffer heads. v6.15 lifts that, adds the
+   <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">FS_LBS</code> gating flag in <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">include/linux/fs.h</code>, and is the first
+   kernel where the full bs &gt; ps stack works for any filesystem.</p>
+</li>
+<li class="leading-relaxed">
+<p class="text-gray-300 leading-relaxed mb-4"><strong class="font-semibold text-gray-100">Filesystem</strong>: an <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">FS_LBS</code>-flagged filesystem that has audited its
+   I/O path for &gt;PAGE_SIZE blocks. As of v7.1: XFS (since v6.12),
+   bcachefs (since v6.15), btrfs (experimental since v6.18), ext4 (since
+   v6.19).</p>
+</li>
+<li class="leading-relaxed">
+<p class="text-gray-300 leading-relaxed mb-4"><strong class="font-semibold text-gray-100">Userspace</strong>: <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">mkfs</code> that accepts and validates a logical sector
+   size larger than <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">PAGE_SIZE</code>, plus monitoring that knows what to
+   watch for at the new size (write amplification, atomic-write counters,
+   per-namespace power-fail granularity).</p>
+</li>
+<li class="leading-relaxed">
+<p class="text-gray-300 leading-relaxed mb-4"><strong class="font-semibold text-gray-100">Distribution support</strong>: the vendor has run the test matrix for
+   their support scope, documented the customer guidance, and is willing
+   to take the support call when it goes wrong.</p>
+</li>
+</ol>
+<p class="text-gray-300 leading-relaxed mb-4">Distribution status as of 2026-05-25:</p>
+<div class="overflow-x-auto -mx-2">
+<table class="w-full text-sm border-collapse mb-6 w-full text-sm border-collapse mb-6" class="w-full text-sm border-collapse mb-6">
+<thead class="border-b border-gray-700 text-gray-400 border-b border-gray-700 text-gray-400" class="border-b border-gray-700 text-gray-400">
+<tr class="border-b border-gray-800"><th class="text-left py-2 px-3 font-medium text-left py-2 px-3 font-medium whitespace-nowrap" class="text-left py-2 px-3 font-medium">Distribution</th><th class="text-left py-2 px-3 font-medium text-left py-2 px-3 font-medium whitespace-nowrap" class="text-left py-2 px-3 font-medium">Released</th><th class="text-left py-2 px-3 font-medium text-left py-2 px-3 font-medium whitespace-nowrap" class="text-left py-2 px-3 font-medium">Base kernel</th><th class="text-left py-2 px-3 font-medium text-left py-2 px-3 font-medium whitespace-nowrap" class="text-left py-2 px-3 font-medium">XFS LBS (v6.12)</th><th class="text-left py-2 px-3 font-medium text-left py-2 px-3 font-medium whitespace-nowrap" class="text-left py-2 px-3 font-medium">bdev-cache LBS (v6.15)</th><th class="text-left py-2 px-3 font-medium text-left py-2 px-3 font-medium" class="text-left py-2 px-3 font-medium">Comment</th></tr>
+</thead>
+<tbody>
+<tr class="border-b border-gray-800 border-b border-gray-800" class="border-b border-gray-800"><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">RHEL 10.0</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">2025-05</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">6.12</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">yes (TP)</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">no</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top" class="py-2 px-3 text-gray-300 align-top">iomap path only; ships before the v6.15 cycle</td></tr>
+<tr class="border-b border-gray-800 border-b border-gray-800" class="border-b border-gray-800"><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">RHEL 10.1+</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">TBD</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">6.12 + backports</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">yes</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">likely (backport)</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top" class="py-2 px-3 text-gray-300 align-top">speculative; watch the release notes</td></tr>
+<tr class="border-b border-gray-800 border-b border-gray-800" class="border-b border-gray-800"><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">SLE 15 SP7</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">2025-06</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">6.4</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">no</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">no</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top" class="py-2 px-3 text-gray-300 align-top">kernel predates LBS upstream</td></tr>
+<tr class="border-b border-gray-800 border-b border-gray-800" class="border-b border-gray-800"><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">SUSE 16.0</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">~2026-06</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">TBD (≥ 6.12)</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">likely</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">backport-dependent</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top" class="py-2 px-3 text-gray-300 align-top">depends on whether the v6.15 bdev work is backported</td></tr>
+<tr class="border-b border-gray-800 border-b border-gray-800" class="border-b border-gray-800"><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">Ubuntu 24.04 LTS</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">2024-04</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">6.8</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">no</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">no</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top" class="py-2 px-3 text-gray-300 align-top">kernel predates LBS; HWE stream may close the gap</td></tr>
+<tr class="border-b border-gray-800 border-b border-gray-800" class="border-b border-gray-800"><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">Ubuntu 26.04 LTS</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">~2026-04</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">TBD (≥ 6.14 expected)</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">likely</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">likely</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top" class="py-2 px-3 text-gray-300 align-top">first LTS with a base kernel new enough to ship the full stack</td></tr>
+<tr class="border-b border-gray-800 border-b border-gray-800" class="border-b border-gray-800"><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">Azure Linux 3</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">2024-10</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">6.6</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">no</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top whitespace-nowrap" class="py-2 px-3 text-gray-300 align-top">no</td><td class="py-2 px-3 text-gray-300 align-top py-2 px-3 text-gray-300 align-top" class="py-2 px-3 text-gray-300 align-top">would need a kernel rebase to pick this up</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="text-gray-300 leading-relaxed mb-4">(Status above is best-effort from public release notes and kernel
+package metadata; corrections via PR welcome. Unreleased rows are
+speculation framed against published distro roadmaps.)</p>
+<p class="text-gray-300 leading-relaxed mb-4">The realistic path from "XFS LBS upstream" (September 2024) to "large
+filesystem sectors as a documented supported configuration on enterprise
+Linux" is at least eighteen months and possibly longer. That puts the
+<em class="italic text-gray-200">real</em> merge-to-enterprise wall-clock for the LBS program closer to two
+years than the 0.71-year row the catalog shows for XFS LBS alone.</p>
+<p class="text-gray-300 leading-relaxed mb-4">Two implications worth pulling out:</p>
+<ul class="list-disc ml-6 space-y-1 mb-4 text-gray-300">
+<li class="leading-relaxed">
+<p class="text-gray-300 leading-relaxed mb-4">The catalog's per-feature <code class="px-1.5 py-0.5 rounded bg-gray-900 text-cyan-300 font-mono text-sm">merge_to_enterprise_years</code> field describes
+  the visible step (the vendor flips a flag), not the underlying
+  capability arriving in production fleets. For features whose value
+  depends on a multi-stage stack — XFS LBS, then bdev cache LBS, then
+  mkfs tooling, then validation — the catalog row can be a substantial
+  underestimate. Future case studies should call this out where it
+  applies; DAX is the obvious next example, with a much worse arc.</p>
+</li>
+<li class="leading-relaxed">
+<p class="text-gray-300 leading-relaxed mb-4">The hardware question is doing more work than the kernel question. An
+  enterprise QLC SSD with NAWUPF ≥ NPWG is the prerequisite that decides
+  whether a customer actually benefits, and adoption of that hardware in
+  the field is not what the kernel project tracks. The fs-features
+  catalog records a kernel feature shipping; the enterprise <em class="italic text-gray-200">value</em> of
+  LBS lives in a column we do not have yet, and that is the column most
+  worth filling in next.</p>
+</li>
+</ul>
 <h2 id="what-this-case-study-suggests-about-how-linux-fs-features-mature" class="text-2xl font-bold mt-12 mb-4 pb-2 border-b border-gray-700 text-gray-100">What this case study suggests about how Linux fs features mature</h2>
 <p class="text-gray-300 leading-relaxed mb-4">Three patterns repeat across LBS that are worth watching for the next
 case study:</p>
