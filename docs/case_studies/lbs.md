@@ -27,7 +27,7 @@ last_updated: 2026-05-25
 
 ## What and why
 
-LBS lets a filesystem use a logical block size larger than the system's
+LBS lets a filesystem use a filesystem block size larger than the system's
 `PAGE_SIZE`. Storage hardware has been quietly shipping 16 KiB indirection
 units for years, databases speak in 16 KiB / 32 KiB pages, and the bigger
 the filesystem block the smaller the metadata overhead. The Linux page
